@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Rutpay - BancoEstado</title>
+
+<style>
+
+*{
+margin:0;
+padding:0;
+box-sizing:border-box;
+font-family:Arial,Helvetica,sans-serif;
+}
+
+body{
+background:#f6f6f6;
+min-height:100vh;
+display:flex;
+justify-content:center;
+align-items:flex-start;
+padding:0;
+overflow-y:auto;
+}
+
+/* Contenedor principal - scrolleable */
+.phone{
+position:relative;
+width:100%;
+max-width:420px;
+min-height:100vh;
+background:#f6f6f6;
+overflow-y:auto;
+display:flex;
+flex-direction:column;
+}
+
+.hero{
+position:relative;
+height:74vh;
+min-height:500px;
+background:#fe6130;
+display:flex;
+justify-content:center;
+align-items:center;
+color:white;
+overflow:hidden;
+flex-shrink:0;
+}
+
+.logo{
+text-align:center;
+z-index:2;
+margin-top:-30px;
+}
+
+/* Logo con imagen - MÁS GRANDE */
+.logo img{
+max-width:260px;
+width:100%;
+height:auto;
+display:block;
+margin:0 auto;
+}
+
+/* ONDA CON SVG */
+.wave{
+position:absolute;
+left:0;
+bottom:-2px;
+width:100%;
+line-height:0;
+overflow:hidden;
+}
+
+.wave svg{
+display:block;
+width:100%;
+height:110px;
+}
+
+.wave path{
+fill:#f6f6f6;
+}
+
+.content{
+position:relative;
+padding:25px 24px 20px;
+text-align:center;
+background:#f6f6f6;
+display:flex;
+flex-direction:column;
+justify-content:flex-start;
+align-items:center;
+flex:1;
+min-height:300px;
+}
+
+/* BOTÓN MÁS PEQUEÑO Y ANGOSTO */
+.btn{
+display:block;
+width:75%;
+max-width:280px;
+margin:0 auto 0;
+padding:12px 10px;
+border:4px solid #1a1a1a;
+border-radius:50px;
+background:white;
+font-size:20px;
+font-weight:700;
+color:#1a1a1a;
+cursor:pointer;
+transition:all 0.15s ease;
+letter-spacing:0.5px;
+text-align:center;
+box-shadow:0 2px 0 rgba(0,0,0,0.05);
+flex-shrink:0;
+text-decoration:none;
+}
+
+.btn:hover{
+transform:scale(1.02);
+background:#fafafa;
+}
+
+/* TEXTO MÁS PEQUEÑO */
+.login{
+margin-top:20px;
+font-size:16px;
+font-weight:700;
+color:#1a1a1a;
+text-decoration:underline;
+text-underline-offset:3px;
+cursor:pointer;
+transition:opacity 0.2s;
+letter-spacing:0.2px;
+flex-shrink:0;
+background:none;
+border:none;
+}
+
+.login:hover{
+opacity:0.7;
+}
+
+/* FOOTER - AHORA ES UN P */
+.footer{
+width:100%;
+text-align:center;
+color:#666;
+font-size:14px;
+background:#f6f6f6;
+padding:20px 16px 30px;
+margin-top:auto;
+flex-shrink:0;
+}
+
+.footer strong{
+color:#ff6535;
+}
+
+/* Barra inferior del teléfono - ahora en el footer */
+.home-bar{
+width:140px;
+height:5px;
+border-radius:10px;
+background:#444;
+margin:10px auto 0;
+flex-shrink:0;
+}
+
+@media(max-width:600px){
+
+.hero{
+height:68vh;
+min-height:400px;
+}
+
+.logo img{
+max-width:220px;
+}
+
+.logo{
+margin-top:-25px;
+}
+
+.btn{
+width:80%;
+max-width:240px;
+padding:11px 9px;
+font-size:18px;
+border-width:3px;
+border-radius:40px;
+}
+
+.login{
+font-size:15px;
+margin-top:18px;
+}
+
+.footer{
+font-size:13px;
+padding:16px 16px 25px;
+}
+
+.wave svg{
+height:95px;
+}
+
+.home-bar{
+width:120px;
+height:4px;
+}
+}
+
+@media(max-width:380px){
+
+.hero{
+height:62vh;
+min-height:350px;
+}
+
+.logo img{
+max-width:180px;
+}
+
+.logo{
+margin-top:-20px;
+}
+
+.btn{
+width:85%;
+max-width:200px;
+padding:10px 8px;
+font-size:16px;
+border-width:3px;
+border-radius:35px;
+}
+
+.login{
+font-size:14px;
+margin-top:15px;
+}
+
+.footer{
+font-size:12px;
+padding:14px 16px 20px;
+}
+
+.wave svg{
+height:80px;
+}
+
+.home-bar{
+width:100px;
+height:4px;
+}
+}
+
+</style>
+
+</head>
+
+<body>
+
+<div class="phone">
+
+<div class="hero">
+
+<div class="logo">
+<!-- Logo reemplazado por la imagen -->
+<img src="https://elcarpinterfalaella.vercel.app/tr.jpeg" alt="Rutpay - BancoEstado">
+</div>
+
+<!-- ONDA SVG -->
+<div class="wave">
+<svg viewBox="0 0 1440 180" preserveAspectRatio="none">
+<path d="M0,140
+C180,190 380,175 580,130
+C820,70 1080,50 1440,80
+L1440,180
+L0,180
+Z"/>
+</svg>
+</div>
+
+</div>
+
+<div class="content">
+
+<!-- Botón Regístrate -> Redirige a Google -->
+<a href="registrorut.html" class="btn">
+Regístrate
+</a>
+
+<!-- Texto "¿Ya tienes un usuario?" -> Redirige a Yahoo -->
+<button class="login" onclick="window.location.href='index.html'">
+¿Ya tienes un usuario? Ingresa aquí
+</button>
+
+<!-- FOOTER COMO P -->
+<p class="footer">
+Rutpay es una aplicación de <strong>BancoEstado</strong>
+</p>
+
+<!-- Barra inferior del teléfono -->
+<div class="home-bar"></div>
+
+</div>
+
+</div>
+
+</body>
+</html>

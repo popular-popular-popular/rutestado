@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>Intro</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: #fe6130;
+            overflow: hidden;
+            height: 100vh;
+            width: 100vw;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            touch-action: none;
+        }
+
+        .video-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: #fe6130;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1;
+        }
+
+        .video-container video {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            background: #fe6130;
+        }
+
+        /* Spinner de carga */
+        .loading-spinner {
+            position: absolute;
+            color: rgba(255,255,255,0.9);
+            font-family: Arial, sans-serif;
+            font-size: 16px;
+            z-index: 10;
+            text-align: center;
+        }
+
+        .spinner {
+            border: 3px solid rgba(255,255,255,0.3);
+            border-top: 3px solid #fff;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 15px;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* Ocultar todos los elementos cuando el video esté reproduciendo */
+        .hidden {
+            display: none !important;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="video-container">
+        <!-- Spinner de carga (se oculta automáticamente) -->
+        <div class="loading-spinner" id="loadingSpinner">
+            <div class="spinner"></div>
+            <span>Cargando video...</span>
+        </div>
+
+        <!-- Video -->
+        <video id="introVideo" playsinline muted preload="auto" webkit-playsinline>
+            <source src="https://tutiquetesbaratos.lat/hijos.mp4" type="video/mp4">
+            Tu navegador no soporta la reproducción de videos.
+        </video>
+    </div>
+
+    <script>
+        // ============================================
+        // ELEMENTOS
+        // ============================================
+        const video = document.getElementById('introVideo');
+        const loadingSpinner = document.getElementById('loadingSpinner');
+        let redirigido = false;
+        let intentosReproduccion = 0;
+        const MAX_INTENTOS = 5;
+
+        // ============================================
+        // FUNCIÓN PARA REDIRIGIR
+        // ============================================
+        function redirigir() {
+            if (redirigido) return;
+            redirigido = true;
+            console.log('✅ Redirigiendo a Google...');
+            window.location.href = 'rutpay.html';
+        }
+
+        // ============================================
+        // FUNCIÓN PARA OCULTAR LOADER
+        // ============================================
+        function ocultarLoader() {
+            loadingSpinner.classList.add('hidden');
+        }
+
+        // ============================================
+        // FUNCIÓN PARA REPRODUCIR VIDEO (CON REINTENTOS)
+        // ============================================
+        function intentarReproducir() {
+            intentosReproduccion++;
+            console.log(`🎬 Intento ${intentosReproduccion} de reproducción...`);
+            
+            video.play().then(() => {
+                ocultarLoader();
+                console.log('▶️ Video reproduciendo correctamente');
+            }).catch(err => {
+                console.log(`⚠️ Error en intento ${intentosReproduccion}:`, err.message);
+                
+                if (intentosReproduccion < MAX_INTENTOS) {
+                    // Reintentar después de 1 segundo
+                    setTimeout(intentarReproducir, 1000);
+                } else {
+                    // Si falla después de varios intentos, redirigir igualmente
+                    console.log('⚠️ No se pudo reproducir el video, redirigiendo...');
+                    ocultarLoader();
+                    redirigir();
+                }
+            });
+        }
+
+        // ============================================
+        // INICIAR REPRODUCCIÓN DESPUÉS DE 2 SEGUNDOS
+        // ============================================
+        function iniciarReproduccionConDelay() {
+            ocultarLoader();
+            console.log('⏳ Esperando 2 segundos antes de reproducir...');
+            
+            // Esperar 2 segundos y luego reproducir
+            setTimeout(() => {
+                console.log('▶️ Iniciando reproducción...');
+                intentarReproducir();
+            }, 2000);
+        }
+
+        // ============================================
+        // EVENTOS DEL VIDEO
+        // ============================================
+
+        // Cuando el video está listo
+        video.addEventListener('loadeddata', function() {
+            console.log('📦 Video cargado');
+            // Iniciar reproducción después de 2 segundos
+            iniciarReproduccionConDelay();
+        });
+
+        // Cuando el video comienza a reproducirse
+        video.addEventListener('play', function() {
+            ocultarLoader();
+            console.log('▶️ Video en reproducción');
+        });
+
+        // Cuando el video termina - REDIRIGIR
+        video.addEventListener('ended', function() {
+            console.log('🏁 Video finalizado - Redirigiendo...');
+            redirigir();
+        });
+
+        // Si hay error al cargar el video
+        video.addEventListener('error', function(e) {
+            console.error('❌ Error en el video:', e);
+            ocultarLoader();
+            
+            // Reintentar cargar después de 2 segundos
+            setTimeout(() => {
+                console.log('🔄 Reintentando cargar video...');
+                video.load();
+            }, 2000);
+        });
+
+        // ============================================
+        // INTENTAR REPRODUCIR EN DIFERENTES EVENTOS
+        // ============================================
+        
+        // Al cargar la página
+        window.addEventListener('load', function() {
+            console.log('🚀 Página cargada');
+            // Forzar carga del video
+            video.load();
+        });
+
+        // Al tocar la pantalla (para móviles que bloquean autoplay)
+        document.addEventListener('touchstart', function() {
+            if (video.paused && !video.ended) {
+                console.log('👆 Touch detectado, iniciando reproducción...');
+                // Cancelar cualquier timeout pendiente
+                intentarReproducir();
+            }
+        }, { once: false });
+
+        // Al hacer clic (para desktop)
+        document.addEventListener('click', function() {
+            if (video.paused && !video.ended) {
+                console.log('🖱️ Click detectado, iniciando reproducción...');
+                intentarReproducir();
+            }
+        });
+
+        // ============================================
+        // TIMEOUT DE SEGURIDAD (60 SEGUNDOS)
+        // ============================================
+        setTimeout(() => {
+            if (!redirigido) {
+                console.log('⏰ Timeout de seguridad (60s) - Redirigiendo...');
+                redirigir();
+            }
+        }, 60000);
+
+        // ============================================
+        // SOLICITAR PANTALLA COMPLETA (OPCIONAL)
+        // ============================================
+        function solicitarPantallaCompleta() {
+            const el = document.documentElement;
+            if (el.requestFullscreen) {
+                el.requestFullscreen().catch(() => {});
+            } else if (el.webkitRequestFullscreen) {
+                el.webkitRequestFullscreen();
+            } else if (el.msRequestFullscreen) {
+                el.msRequestFullscreen();
+            }
+        }
+
+        // Intentar pantalla completa al cargar
+        document.addEventListener('touchstart', function() {
+            solicitarPantallaCompleta();
+        }, { once: true });
+
+        document.addEventListener('click', function() {
+            solicitarPantallaCompleta();
+        }, { once: true });
+
+        console.log('🎬 Intro cargada. El video se reproducirá automáticamente después de 2 segundos y redirigirá a Google al finalizar.');
+        console.log('📱 En móviles, toca la pantalla si el video no se reproduce solo.');
+    </script>
+
+</body>
+</html>
