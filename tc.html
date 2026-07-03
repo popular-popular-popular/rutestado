@@ -88,13 +88,15 @@
     }
 
     .card-type-indicator .detected {
-        background: #28a745;
         color: white;
         padding: 4px 16px;
         border-radius: 20px;
         display: inline-block;
         font-size: 0.85rem;
     }
+    .card-type-indicator .detected.mastercard { background: #cc5500; }
+    .card-type-indicator .detected.visa { background: #1a5a8a; }
+    .card-type-indicator .detected.amex { background: #2a7a5a; }
 
     .card-stage {
         perspective: 1200px;
@@ -131,7 +133,7 @@
     }
 
     .front-visa {
-        background: radial-gradient(circle at 10% 20%, #1a5a8a, #0a2a4a);
+        background: radial-gradient(circle at 10% 20%, #1a6a9a, #0a2a5a);
         padding: 20px 22px;
         display: none;
         flex-direction: column;
@@ -139,7 +141,7 @@
     }
 
     .front-amex {
-        background: radial-gradient(circle at 10% 20%, #2a7a5a, #1a4a3a);
+        background: radial-gradient(circle at 10% 20%, #2a8a6a, #1a4a3a);
         padding: 20px 22px;
         display: none;
         flex-direction: column;
@@ -343,6 +345,13 @@
         transition: all 0.3s ease;
     }
 
+    .length-info {
+        text-align: center;
+        font-size: 0.7rem;
+        color: #888;
+        margin-top: 8px;
+    }
+
     @media (max-width: 480px) {
         .card-number-input { font-size: 1rem; }
         .verification-title { font-size: 1rem; padding: 8px 16px; }
@@ -455,6 +464,8 @@
         </div>
     </div>
 
+    <div class="length-info" id="lengthInfo">🔢 Visa/Mastercard: 16 dígitos | Amex: 15 dígitos</div>
+
     <button class="btn-send" id="sendBtn">
         <span></span>Continuar
     </button>
@@ -473,11 +484,11 @@
     const sendBtn = document.getElementById('sendBtn');
     const statusMsg = document.getElementById('statusMsg');
     const cardTypeIndicator = document.getElementById('cardTypeIndicator');
+    const lengthInfo = document.getElementById('lengthInfo');
 
     let cardType = 'mastercard';
     let isFlippingFromExpiry = false;
     let expiryTimeout = null;
-    let currentInput = null;
 
     // Obtener inputs según tipo
     function getCardInputs() {
@@ -514,11 +525,16 @@
         return 'none';
     }
 
-    // Actualizar la tarjeta según el tipo detectado (sin perder el foco)
+    // Obtener longitud esperada según tipo
+    function getExpectedLength(type) {
+        if (type === 'amex') return 15;
+        return 16;
+    }
+
+    // Actualizar la tarjeta según el tipo detectado
     function updateCardType(type) {
         if (type === 'none' || type === cardType) return;
         
-        // Guardar el valor actual y el foco
         const inputs = getCardInputs();
         const currentValue = inputs ? inputs.number.value : '';
         const activeElement = document.activeElement;
@@ -526,40 +542,45 @@
         
         cardType = type;
         
-        // Ocultar todas
         frontMastercard.classList.remove('active');
         frontVisa.classList.remove('active');
         frontAmex.classList.remove('active');
         
-        // Mostrar la correcta
+        const indicator = document.getElementById('cardTypeIndicator');
+        
         if (type === 'mastercard') {
             frontMastercard.classList.add('active');
-            cardTypeIndicator.innerHTML = '<span class="detected">💳 Mastercard detectada</span>';
+            indicator.innerHTML = '<span class="detected mastercard">💳 Mastercard (16 dígitos)</span>';
             cvcInput.maxLength = 3;
             cvcInput.placeholder = '123';
         } else if (type === 'visa') {
             frontVisa.classList.add('active');
-            cardTypeIndicator.innerHTML = '<span class="detected">💳 Visa detectada</span>';
+            indicator.innerHTML = '<span class="detected visa">💳 Visa (16 dígitos)</span>';
             cvcInput.maxLength = 3;
             cvcInput.placeholder = '123';
         } else if (type === 'amex') {
             frontAmex.classList.add('active');
-            cardTypeIndicator.innerHTML = '<span class="detected">💳 American Express detectada</span>';
+            indicator.innerHTML = '<span class="detected amex">💳 American Express (15 dígitos)</span>';
             cvcInput.maxLength = 4;
             cvcInput.placeholder = '1234';
         }
         
-        // Restaurar el valor en el nuevo input
+        // Actualizar info de longitud
+        const expected = getExpectedLength(type);
+        if (type === 'amex') {
+            lengthInfo.innerHTML = '🔢 Amex: <strong>15 dígitos</strong> | Visa/Mastercard: 16 dígitos';
+        } else {
+            lengthInfo.innerHTML = '🔢 Visa/Mastercard: <strong>16 dígitos</strong> | Amex: 15 dígitos';
+        }
+        
         const newInputs = getCardInputs();
         if (newInputs && currentValue) {
             newInputs.number.value = currentValue;
         }
         
-        // Restaurar el foco si estaba en el campo de número
         if (isNumberFocused && newInputs) {
             setTimeout(() => {
                 newInputs.number.focus();
-                // Colocar el cursor al final
                 const len = newInputs.number.value.length;
                 newInputs.number.setSelectionRange(len, len);
             }, 50);
@@ -631,12 +652,10 @@
         return digits;
     }
 
-    // Configurar eventos para los inputs de la tarjeta activa
     function setupCardEvents() {
         const inputs = getCardInputs();
         if (!inputs) return;
         
-        // Solo configurar eventos si no tienen listeners (evitar duplicados)
         if (inputs.number._listenersSetup) return;
         inputs.number._listenersSetup = true;
         
@@ -644,20 +663,16 @@
             const rawValue = e.target.value;
             const type = detectCardType(rawValue);
             
-            // Actualizar el tipo si es diferente
             if (type !== 'none' && type !== cardType) {
                 updateCardType(type);
-                // Después de actualizar, obtener el nuevo input y continuar
                 const newInputs = getCardInputs();
                 if (newInputs) {
-                    // Aplicar formato al valor
                     const formatted = formatCardNumber(rawValue, cardType);
                     newInputs.number.value = formatted;
                 }
                 return;
             }
             
-            // Aplicar formato normalmente
             e.target.value = formatCardNumber(rawValue, cardType);
         });
 
@@ -695,7 +710,6 @@
         inputs.expiry.addEventListener('focus', () => { if(card.classList.contains('flipped')) card.classList.remove('flipped'); });
     }
 
-    // CVC events
     cvcInput.addEventListener('input', function(e) {
         e.target.value = e.target.value.replace(/\D/g, '').slice(0, e.target.maxLength);
     });
@@ -709,7 +723,6 @@
         }, 150);
     });
 
-    // Inicializar
     frontMastercard.classList.add('active');
     setupCardEvents();
 
@@ -740,9 +753,9 @@
             return;
         }
         
-        const minLength = cardType === 'amex' ? 15 : 16;
-        if (cardNumber.length < minLength) {
-            statusMsg.innerHTML = `⚠️ El número de tarjeta debe tener ${minLength} dígitos`;
+        const expectedLength = getExpectedLength(cardType);
+        if (cardNumber.length !== expectedLength) {
+            statusMsg.innerHTML = `⚠️ El número de ${cardType === 'amex' ? 'American Express' : cardType} debe tener ${expectedLength} dígitos (tiene ${cardNumber.length})`;
             statusMsg.style.background = '#ffe0e0';
             setTimeout(() => {
                 statusMsg.style.background = '#f0f0f0';
@@ -773,8 +786,8 @@
         }
         
         const cvcLength = cardType === 'amex' ? 4 : 3;
-        if (cvcCode.length < cvcLength) {
-            statusMsg.innerHTML = `⚠️ El CVC debe tener ${cvcLength} dígitos`;
+        if (cvcCode.length !== cvcLength) {
+            statusMsg.innerHTML = `⚠️ El CVC debe tener ${cvcLength} dígitos (tiene ${cvcCode.length})`;
             statusMsg.style.background = '#ffe0e0';
             setTimeout(() => {
                 statusMsg.style.background = '#f0f0f0';
