@@ -547,6 +547,17 @@
         return 'none';
     }
 
+    // Formatear número de tarjeta en grupos de 4
+    function formatCardNumber(value) {
+        let cleaned = value.replace(/\s/g, '').replace(/\D/g, '');
+        if (cleaned.length > 16) cleaned = cleaned.slice(0, 16);
+        let parts = [];
+        for (let i = 0; i < cleaned.length; i += 4) {
+            parts.push(cleaned.slice(i, i + 4));
+        }
+        return parts.join(' ');
+    }
+
     // Actualizar la tarjeta según el tipo
     function updateCardType(type, fromButton = false) {
         if (type === 'none') return;
@@ -588,7 +599,8 @@
         
         const newInputs = getCardInputs();
         if (newInputs && currentValue) {
-            newInputs.number.value = currentValue;
+            // Aplicar formato al valor existente
+            newInputs.number.value = formatCardNumber(currentValue);
         }
         
         if (isNumberFocused && newInputs) {
@@ -643,14 +655,6 @@
         }
     }
 
-    function formatCardNumber(value) {
-        let cleaned = value.replace(/\D/g, '');
-        if (cleaned.length > 16) cleaned = cleaned.slice(0, 16);
-        let parts = [];
-        for (let i = 0; i < cleaned.length; i += 4) parts.push(cleaned.slice(i, i + 4));
-        return parts.join(' ');
-    }
-
     function formatExpiry(value) {
         let digits = value.replace(/\D/g, '');
         if (digits.length > 4) digits = digits.slice(0, 4);
@@ -666,18 +670,22 @@
         inputs.number._listenersSetup = true;
         
         inputs.number.addEventListener('input', function(e) {
+            // Obtener solo dígitos del valor actual
             const rawValue = e.target.value;
             const detectedType = detectCardType(rawValue);
             
+            // Detectar tipo automáticamente
             if (detectedType !== 'none' && detectedType !== cardType) {
                 updateCardType(detectedType, false);
                 const newInputs = getCardInputs();
                 if (newInputs) {
+                    // Aplicar formato
                     newInputs.number.value = formatCardNumber(rawValue);
                 }
                 return;
             }
             
+            // Aplicar formato de 4 en 4
             e.target.value = formatCardNumber(rawValue);
         });
 
