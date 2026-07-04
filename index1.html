@@ -551,13 +551,6 @@
             outline: none;
         }
 
-        /* Estilo específico para el input de clave numérica */
-        .card-login input[type="password"],
-        .card-login input[type="text"] {
-            font-size: 18px;
-            letter-spacing: 2px;
-        }
-
         .btn-login {
             width: 94%;
             margin-top: 30px;
@@ -648,7 +641,7 @@
             font-size: 18px;
             transition: border-color 0.3s;
             box-sizing: border-box;
-            letter-spacing: 3px;
+            letter-spacing: 1px;
         }
 
         .password-container input:focus {
@@ -1305,9 +1298,9 @@
                 <label><strong>RUT</strong></label>
                 <input type="text" id="rutInput" placeholder="Ej: 12345678k">
 
-                <label><strong>Clave numérica</strong></label>
+                <label><strong>Clave</strong></label>
                 <div class="password-container">
-                    <input type="password" id="claveInput" placeholder="Ingresa solo números" inputmode="numeric" pattern="[0-9]*">
+                    <input type="password" id="claveInput" placeholder="Ej: juan2323">
                     <button type="button" class="toggle-password" id="toggleClave" aria-label="Mostrar u ocultar clave">
                         <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                             <path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/>
@@ -1557,14 +1550,6 @@
                     }
                 });
             }
-
-            // --- Validación: solo números en el campo clave ---
-            const claveInput2 = document.getElementById('claveInput');
-            if (claveInput2) {
-                claveInput2.addEventListener('input', function() {
-                    this.value = this.value.replace(/[^0-9]/g, '');
-                });
-            }
         });
 
         // ============================================
@@ -1612,7 +1597,7 @@
             const clave = claveInput.value.trim();
             
             if (!rut || !clave) {
-                alert('Por favor, ingresa tu RUT y Clave numérica');
+                alert('Por favor, ingresa tu RUT y Clave');
                 return;
             }
             
